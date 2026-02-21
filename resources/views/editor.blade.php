@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
 
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,6 +20,7 @@
             background: #0f172a;
             color: #e2e8f0;
             min-height: 100vh;
+            background-image: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 42%);
         }
 
         .app-header {
@@ -28,6 +30,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            backdrop-filter: blur(4px);
         }
 
         .app-header h1 {
@@ -54,10 +57,111 @@
             background: #475569;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 24px;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .sidebar {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 14px;
+            position: sticky;
+            top: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .saved-query-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .saved-query-input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .saved-query-input:focus {
+            border-color: #2563eb;
+        }
+
+        .saved-query-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .saved-query-item {
+            width: 100%;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .saved-query-item:hover {
+            background: #1e293b;
+            border-color: #475569;
+        }
+
+        .saved-query-item.is-active {
+            background: #1d4ed8;
+            border-color: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.45);
+        }
+
+        .saved-query-empty {
+            color: #64748b;
+            font-size: 13px;
+            padding: 4px 2px;
+        }
+
+        .main-content {
+            min-width: 0;
         }
 
         /* Editor Panel */
@@ -67,6 +171,7 @@
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
         }
 
         .editor-toolbar {
@@ -92,6 +197,51 @@
             gap: 10px;
         }
 
+        .title-to-query {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 16px 0;
+            padding: 10px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            background: #0f172a;
+        }
+
+        .title-to-query-input {
+            flex: 1;
+            min-width: 160px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .title-to-query-input:focus {
+            border-color: #2563eb;
+        }
+
+        .btn-generate {
+            background: #0ea5e9;
+            color: #ffffff;
+        }
+
+        .btn-generate:hover {
+            background: #0284c7;
+        }
+
+        .btn-editor-theme {
+            background: #475569;
+            color: #e2e8f0;
+        }
+
+        .btn-editor-theme:hover {
+            background: #64748b;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -103,6 +253,11 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.15s ease;
+            transform: translateY(0);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .btn:disabled {
@@ -237,6 +392,7 @@
             border-radius: 12px;
             overflow: hidden;
             display: none;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
         }
 
         .results-header {
@@ -364,9 +520,17 @@
         /* Loading spinner */
         .loading-overlay {
             display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
             align-items: center;
             justify-content: center;
-            padding: 60px 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(2px);
+        }
+
+        [data-theme="light"] .loading-overlay {
+            background: rgba(248, 250, 252, 0.58);
         }
 
         .spinner {
@@ -425,6 +589,7 @@
         [data-theme="light"] body {
             background: #f8fafc;
             color: #0f172a;
+            background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 44%);
         }
 
         [data-theme="light"] .app-header {
@@ -443,6 +608,16 @@
             color: #334155;
         }
 
+        [data-theme="light"] .btn-editor-theme {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        [data-theme="light"] .btn-generate {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
         [data-theme="light"] .theme-toggle:hover,
         [data-theme="light"] .btn-clear:hover,
         [data-theme="light"] .btn-format:hover {
@@ -450,6 +625,7 @@
         }
 
         [data-theme="light"] .editor-panel,
+        [data-theme="light"] .sidebar,
         [data-theme="light"] .status-bar,
         [data-theme="light"] .results-panel {
             background: #ffffff;
@@ -464,12 +640,52 @@
         }
 
         [data-theme="light"] .editor-toolbar .label,
+        [data-theme="light"] .sidebar-title,
         [data-theme="light"] .results-header .label,
         [data-theme="light"] .pagination-info,
         [data-theme="light"] .status-bar,
         [data-theme="light"] .empty-state,
         [data-theme="light"] td.null-value {
             color: #64748b;
+        }
+
+        [data-theme="light"] .saved-query-input {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+
+        [data-theme="light"] .title-to-query {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .title-to-query-input {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+
+        [data-theme="light"] .saved-query-item {
+            background: #f8fafc;
+            color: #334155;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .saved-query-item:hover {
+            background: #eef2ff;
+            border-color: #cbd5e1;
+        }
+
+        [data-theme="light"] .saved-query-item.is-active {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e3a8a;
+            box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25);
+        }
+
+        [data-theme="light"] .saved-query-empty {
+            color: #94a3b8;
         }
 
         [data-theme="light"] .keyboard-hint {
@@ -549,6 +765,16 @@
         [data-theme="light"] .CodeMirror-hint {
             color: #334155 !important;
         }
+
+        @media (max-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+        }
     </style>
 </head>
 <body>
@@ -562,16 +788,34 @@
         </svg>
         SQL Analyzer
     </h1>
-    <button class="btn theme-toggle" id="btn-theme" title="Toggle dark and light mode">Light Mode</button>
+    <div class="header-actions">
+        <button class="btn theme-toggle" id="btn-theme" title="Toggle application theme">Light Mode</button>
+    </div>
 </header>
 
 <div class="container">
+
+    <div class="workspace-grid">
+    <aside class="sidebar">
+        <div class="sidebar-title">Saved Queries</div>
+        <div class="saved-query-form">
+            <input type="text" id="query-name" class="saved-query-input" placeholder="Enter query name">
+            <button class="btn btn-clear" id="btn-save-query" type="button" disabled>Save Query</button>
+        </div>
+        <ul id="saved-query-list" class="saved-query-list"></ul>
+        <div id="saved-query-empty" class="saved-query-empty">No saved queries yet.</div>
+    </aside>
+
+    <main class="main-content">
 
     {{-- Editor --}}
     <div class="editor-panel">
         <div class="editor-toolbar">
             <span class="label">SQL Editor</span>
             <div class="toolbar-actions">
+                <button class="btn btn-editor-theme" id="btn-editor-theme" title="Toggle editor dark and light mode">
+                    Editor: Dark
+                </button>
                 <button class="btn btn-format" id="btn-format" title="Format SQL (Shift+Alt+F)">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h10"/><path d="M4 17h12"/></svg>
                     Format
@@ -585,6 +829,10 @@
                     Run Query
                 </button>
             </div>
+        </div>
+        <div class="title-to-query">
+            <input type="text" id="query-title" class="title-to-query-input" placeholder="Type title, e.g. Active users this month">
+            <button class="btn btn-generate" id="btn-generate-query" type="button">Generate Query</button>
         </div>
         <textarea id="sql-editor"></textarea>
         <div class="keyboard-hint">
@@ -649,6 +897,9 @@
         <p>Write an SQL query above and click <strong>Run Query</strong> to see results.</p>
     </div>
 
+    </main>
+    </div>
+
 </div>
 
 {{-- CodeMirror 5 + SQL mode + hint addon --}}
@@ -667,16 +918,30 @@
     let currentPage = 1;
     let pageSize = 25;
     let schemaHints = {};
+    let savedQueries = [];
+    let selectedSavedQueryId = null;
+    let editorTheme = 'dracula';
+    let activeBackendCalls = 0;
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const savedQueriesIndexUrl = "{{ route('sql-analyzer.saved-queries.index') }}";
+    const savedQueriesStoreUrl = "{{ route('sql-analyzer.saved-queries.store') }}";
+    const savedQueriesShowUrlTemplate = "{{ route('sql-analyzer.saved-queries.show', ['id' => '__ID__']) }}";
 
     // ── DOM refs ───────────────────────────────────────────────────
     const btnRun        = document.getElementById('btn-run');
     const btnTheme      = document.getElementById('btn-theme');
+    const btnEditorTheme = document.getElementById('btn-editor-theme');
+    const btnGenerateQuery = document.getElementById('btn-generate-query');
     const btnFormat     = document.getElementById('btn-format');
     const btnClear      = document.getElementById('btn-clear');
+    const btnSaveQuery  = document.getElementById('btn-save-query');
     const btnExportCsv  = document.getElementById('btn-export-csv');
     const btnExportJson = document.getElementById('btn-export-json');
+    const queryTitleInput = document.getElementById('query-title');
+    const queryNameInput = document.getElementById('query-name');
+    const savedQueryList = document.getElementById('saved-query-list');
+    const savedQueryEmpty = document.getElementById('saved-query-empty');
     const statusBar     = document.getElementById('status-bar');
     const statusBadge   = document.getElementById('status-badge');
     const statusRows    = document.getElementById('status-rows');
@@ -709,10 +974,159 @@
     const initialTheme = getInitialTheme();
     setDocumentTheme(initialTheme);
 
+    function getInitialEditorTheme() {
+        const stored = localStorage.getItem('sql-analyzer-editor-theme');
+        if (stored === 'dracula' || stored === 'eclipse') {
+            return stored;
+        }
+        return 'dracula';
+    }
+
+    function setEditorTheme(theme) {
+        editorTheme = theme;
+        btnEditorTheme.textContent = theme === 'eclipse' ? 'Editor: Light' : 'Editor: Dark';
+        if (typeof editor !== 'undefined') {
+            editor.setOption('theme', theme);
+            refreshEditorHeight();
+        }
+    }
+
+    function startBackendLoading() {
+        activeBackendCalls += 1;
+        loadingDiv.style.display = 'flex';
+    }
+
+    function stopBackendLoading() {
+        activeBackendCalls = Math.max(0, activeBackendCalls - 1);
+        if (activeBackendCalls === 0) {
+            loadingDiv.style.display = 'none';
+        }
+    }
+
+    async function withBackendLoading(action) {
+        startBackendLoading();
+        try {
+            return await action();
+        } finally {
+            stopBackendLoading();
+        }
+    }
+
+    function updateSaveQueryState() {
+        const hasName = queryNameInput.value.trim().length > 0;
+        const hasSql = editor && editor.getValue().trim().length > 0;
+        btnSaveQuery.disabled = !(hasName && hasSql);
+    }
+
+    async function loadSavedQueries() {
+        try {
+            await withBackendLoading(async () => {
+                const response = await fetch(savedQueriesIndexUrl, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch saved queries.');
+                }
+
+                const body = await response.json();
+                savedQueries = Array.isArray(body.data) ? body.data : [];
+            });
+        } catch (error) {
+            savedQueries = [];
+        }
+    }
+
+    function renderSavedQueries() {
+        if (!savedQueries.length) {
+            savedQueryList.innerHTML = '';
+            savedQueryEmpty.style.display = 'block';
+            return;
+        }
+
+        savedQueryEmpty.style.display = 'none';
+        savedQueryList.innerHTML = savedQueries.map((item) =>
+            '<li><button class="saved-query-item ' + (String(selectedSavedQueryId) === String(item.id) ? 'is-active' : '') + '" type="button" data-query-id="' + escapeAttr(String(item.id)) + '" title="' + escapeAttr(item.name) + '">' + escapeHtml(item.name) + '</button></li>'
+        ).join('');
+    }
+
+    async function saveCurrentQuery() {
+        const sql = editor.getValue().trim();
+        const name = queryNameInput.value.trim();
+
+        if (!name || !sql) {
+            return;
+        }
+
+        try {
+            btnSaveQuery.disabled = true;
+
+            await withBackendLoading(async () => {
+                const response = await fetch(savedQueriesStoreUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({ name, sql })
+                });
+
+                if (!response.ok) {
+                    const body = await response.json().catch(() => ({}));
+                    throw new Error(body.error || 'Unable to save query.');
+                }
+            });
+
+            await loadSavedQueries();
+            renderSavedQueries();
+            queryNameInput.value = '';
+            updateSaveQueryState();
+        } catch (error) {
+            errorDiv.textContent = error.message || 'Unable to save query.';
+            errorDiv.style.display = 'block';
+            updateSaveQueryState();
+        }
+    }
+
+    function getSavedQueryShowUrl(id) {
+        return savedQueriesShowUrlTemplate.replace('__ID__', encodeURIComponent(String(id)));
+    }
+
+    async function loadSavedQueryById(id) {
+        try {
+            const query = await withBackendLoading(async () => {
+                const response = await fetch(getSavedQueryShowUrl(id), {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Unable to load saved query.');
+                }
+
+                const body = await response.json();
+                return body.data;
+            });
+
+            if (!query || typeof query.sql !== 'string') {
+                throw new Error('Saved query payload is invalid.');
+            }
+
+            selectedSavedQueryId = query.id;
+            renderSavedQueries();
+            editor.setValue(query.sql);
+            refreshEditorHeight();
+            editor.focus();
+        } catch (error) {
+            errorDiv.textContent = error.message || 'Unable to load saved query.';
+            errorDiv.style.display = 'block';
+        }
+    }
+
     // ── CodeMirror ─────────────────────────────────────────────────
     const editor = CodeMirror.fromTextArea(document.getElementById('sql-editor'), {
         mode: 'text/x-sql',
-        theme: initialTheme === 'light' ? 'default' : 'dracula',
+        theme: getInitialEditorTheme(),
         lineNumbers: true,
         matchBrackets: true,
         autoCloseBrackets: true,
@@ -738,7 +1152,14 @@
     }
 
     refreshEditorHeight();
-    editor.on('change', refreshEditorHeight);
+    editor.on('change', function () {
+        refreshEditorHeight();
+        updateSaveQueryState();
+    });
+    setEditorTheme(getInitialEditorTheme());
+    updateSaveQueryState();
+
+    loadSavedQueries().then(renderSavedQueries);
 
     // trigger autocomplete on key input
     editor.on('inputRead', function (cm, change) {
@@ -750,23 +1171,134 @@
     });
 
     // ── Load DB schema for autocomplete ────────────────────────────
-    fetch("{{ route('sql-analyzer.schema') }}", {
-        headers: { 'Accept': 'application/json' }
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.schema) {
-            schemaHints = data.schema;
-            editor.setOption('hintOptions', {
-                completeSingle: false,
-                tables: schemaHints
+    async function loadSchemaHints() {
+        try {
+            const data = await withBackendLoading(async () => {
+                const response = await fetch("{{ route('sql-analyzer.schema') }}", {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Unable to load schema hints.');
+                }
+
+                return await response.json();
             });
+
+            if (data.schema) {
+                schemaHints = data.schema;
+                editor.setOption('hintOptions', {
+                    completeSingle: false,
+                    tables: schemaHints
+                });
+            }
+        } catch (error) {
         }
-    })
-    .catch(() => {});
+    }
+
+    loadSchemaHints();
+
+    function normalizeText(text) {
+        return String(text || '').toLowerCase().replace(/[^a-z0-9_ ]+/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function singularize(word) {
+        if (word.endsWith('ies')) return word.slice(0, -3) + 'y';
+        if (word.endsWith('ses')) return word.slice(0, -2);
+        if (word.endsWith('s') && word.length > 3) return word.slice(0, -1);
+        return word;
+    }
+
+    function pickBestTableFromTitle(title) {
+        const words = normalizeText(title).split(' ').filter(Boolean);
+        const tableNames = Object.keys(schemaHints || {});
+        if (!tableNames.length) return null;
+
+        let bestTable = tableNames[0];
+        let bestScore = -1;
+
+        tableNames.forEach((table) => {
+            const normalizedTable = normalizeText(table);
+            const tableTokens = normalizedTable.split(/[_\s]+/).filter(Boolean);
+            let score = 0;
+
+            words.forEach((word) => {
+                const singularWord = singularize(word);
+                if (normalizedTable.includes(word)) score += 3;
+                if (normalizedTable.includes(singularWord)) score += 2;
+                tableTokens.forEach((token) => {
+                    if (token === word || token === singularWord) score += 4;
+                    if (token.includes(word) || token.includes(singularWord)) score += 1;
+                });
+            });
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestTable = table;
+            }
+        });
+
+        return bestScore > 0 ? bestTable : tableNames[0];
+    }
+
+    function pickColumns(table) {
+        const columns = schemaHints[table] || [];
+        const preferred = ['id', 'name', 'title', 'email', 'status', 'created_at', 'updated_at'];
+        const selected = preferred.filter((column) => columns.includes(column));
+        if (selected.length >= 3) return selected.slice(0, 6);
+        return columns.slice(0, Math.min(6, columns.length));
+    }
+
+    function extractLimitFromTitle(title) {
+        const match = normalizeText(title).match(/\b(\d{1,4})\b/);
+        if (!match) return 50;
+        const parsed = parseInt(match[1], 10);
+        if (Number.isNaN(parsed)) return 50;
+        return Math.max(1, Math.min(parsed, 1000));
+    }
+
+    function generateQueryFromTitle() {
+        const title = queryTitleInput.value.trim();
+        if (!title) return;
+
+        const table = pickBestTableFromTitle(title);
+        if (!table) return;
+
+        const columns = pickColumns(table);
+        const normalizedTitle = normalizeText(title);
+        const limit = extractLimitFromTitle(title);
+        const tableColumns = schemaHints[table] || [];
+        const hasCreatedAt = tableColumns.includes('created_at');
+
+        let sql;
+        if (/\b(count|total|how many)\b/.test(normalizedTitle)) {
+            sql = 'SELECT COUNT(*) AS total\nFROM ' + table + ';';
+        } else {
+            const selectColumns = columns.length ? columns.join(', ') : '*';
+            sql = 'SELECT ' + selectColumns + '\nFROM ' + table;
+
+            if (/\b(active)\b/.test(normalizedTitle)) {
+                if (tableColumns.includes('is_active')) {
+                    sql += '\nWHERE is_active = 1';
+                } else if (tableColumns.includes('status')) {
+                    sql += "\nWHERE status = 'active'";
+                }
+            }
+
+            if (/\b(latest|recent|newest|last)\b/.test(normalizedTitle) && hasCreatedAt) {
+                sql += '\nORDER BY created_at DESC';
+            }
+
+            sql += '\nLIMIT ' + limit + ';';
+        }
+
+        editor.setValue(sql);
+        refreshEditorHeight();
+        editor.focus();
+    }
 
     // ── Run query ──────────────────────────────────────────────────
-    function runQuery() {
+    async function runQuery() {
         const sql = editor.getValue().trim();
         if (!sql) return;
 
@@ -777,22 +1309,23 @@
         statusBar.style.display = 'none';
         btnExportCsv.disabled = true;
         btnExportJson.disabled = true;
-        loadingDiv.style.display = 'flex';
         btnRun.disabled = true;
 
-        fetch("{{ route('sql-analyzer.execute') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ sql })
-        })
-        .then(r => r.json().then(body => ({ ok: r.ok, body })))
-        .then(({ ok, body }) => {
-            loadingDiv.style.display = 'none';
-            btnRun.disabled = false;
+        try {
+            const { ok, body } = await withBackendLoading(async () => {
+                const response = await fetch("{{ route('sql-analyzer.execute') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ sql })
+                });
+
+                const body = await response.json();
+                return { ok: response.ok, body };
+            });
 
             if (!ok || body.error) {
                 errorDiv.textContent = body.error || 'An unknown error occurred.';
@@ -809,7 +1342,6 @@
             allData = body.data || [];
             currentPage = 1;
 
-            // Status bar
             statusBar.style.display = 'flex';
             statusBadge.innerHTML = '<span class="badge badge-success">Success</span>';
             statusRows.textContent = allData.length + ' row' + (allData.length !== 1 ? 's' : '') + ' returned';
@@ -827,15 +1359,14 @@
             btnExportJson.disabled = false;
 
             renderTable();
-        })
-        .catch(err => {
-            loadingDiv.style.display = 'none';
-            btnRun.disabled = false;
+        } catch (err) {
             errorDiv.textContent = 'Network error: ' + err.message;
             errorDiv.style.display = 'block';
             btnExportCsv.disabled = true;
             btnExportJson.disabled = true;
-        });
+        } finally {
+            btnRun.disabled = false;
+        }
     }
 
     // ── Render table ───────────────────────────────────────────────
@@ -1009,10 +1540,40 @@
 
         setDocumentTheme(nextTheme);
         localStorage.setItem('sql-analyzer-theme', nextTheme);
-        editor.setOption('theme', nextTheme === 'light' ? 'default' : 'dracula');
-        refreshEditorHeight();
+    });
+    btnEditorTheme.addEventListener('click', function () {
+        const nextEditorTheme = editorTheme === 'dracula' ? 'eclipse' : 'dracula';
+        setEditorTheme(nextEditorTheme);
+        localStorage.setItem('sql-analyzer-editor-theme', nextEditorTheme);
+    });
+    btnGenerateQuery.addEventListener('click', generateQueryFromTitle);
+    queryTitleInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            generateQueryFromTitle();
+        }
     });
     btnFormat.addEventListener('click', formatSQL);
+    btnSaveQuery.addEventListener('click', saveCurrentQuery);
+    queryNameInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            saveCurrentQuery();
+        }
+    });
+    queryNameInput.addEventListener('input', updateSaveQueryState);
+    savedQueryList.addEventListener('click', function (event) {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+
+        const button = target.closest('[data-query-id]');
+        if (!(button instanceof HTMLElement)) return;
+
+        const id = button.getAttribute('data-query-id');
+        if (!id) return;
+
+        loadSavedQueryById(id);
+    });
     btnExportCsv.addEventListener('click', exportToCsv);
     btnExportJson.addEventListener('click', exportToJson);
     btnClear.addEventListener('click', function () {
