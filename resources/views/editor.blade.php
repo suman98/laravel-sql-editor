@@ -154,6 +154,65 @@
             box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.45);
         }
 
+        .saved-query-item-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .saved-query-item-wrapper .saved-query-item {
+            flex: 1;
+            margin: 0;
+        }
+
+        .saved-query-item-wrapper:hover .btn-delete-query {
+            opacity: 1;
+        }
+
+        .btn-delete-query {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #f1576c;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s, background-color 0.2s;
+            font-size: 18px;
+            font-weight: 300;
+            line-height: 1;
+        }
+
+        .btn-delete-query:hover {
+            background: rgba(241, 87, 108, 0.1);
+            opacity: 1;
+        }
+
+        .btn-delete-query:active {
+            background: rgba(241, 87, 108, 0.2);
+        }
+
+        [data-theme="light"] .btn-delete-query {
+            color: #dc2626;
+        }
+
+        [data-theme="light"] .btn-delete-query:hover {
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        [data-theme="light"] .btn-delete-query:active {
+            background: rgba(220, 38, 38, 0.2);
+        }
+
         .saved-query-empty {
             color: #64748b;
             font-size: 13px;
@@ -466,7 +525,7 @@
         }
 
         .CodeMirror-scroll {
-            min-height: 220px;
+            min-height: calc(100vh - 250px);
             max-height: none;
             overflow-y: hidden;
             overflow-x: auto !important;
@@ -992,6 +1051,453 @@
             color: #334155 !important;
         }
 
+        /* Show All Tables */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 0;
+        }
+
+        .tab-button {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: #e2e8f0;
+        }
+
+        .tab-button.active {
+            color: #38bdf8;
+            border-bottom-color: #0284c7;
+        }
+
+        .tab-content {
+            display: none;
+            min-height: calc(100vh - 280px);
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tables-search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .tables-search-input {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .tables-search-input:focus {
+            border-color: #2563eb;
+        }
+
+        .tables-search-input::placeholder {
+            color: #64748b;
+        }
+
+        .tables-list {
+            display: grid;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .tables-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tables-list::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 10px;
+        }
+
+        .tables-list::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+
+        .tables-list::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .tables-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: #64748b;
+            text-align: center;
+            flex: 1;
+        }
+
+        .tables-empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .table-browser-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .table-browser-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .table-browser-item:hover {
+            border-color: #475569;
+            background: #1e293b;
+        }
+
+        .table-browser-header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .table-browser-name {
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-browser-arrow {
+            color: #64748b;
+            transition: transform 0.2s ease;
+            width: 18px;
+            height: 18px;
+        }
+
+        .table-browser-item.expanded .table-browser-arrow {
+            transform: rotate(90deg);
+        }
+
+        .table-browser-content {
+            display: none;
+            padding: 12px 16px;
+            border-top: 1px solid #334155;
+        }
+
+        .table-browser-item.expanded .table-browser-content {
+            display: block;
+        }
+
+        .schema-grid {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .schema-column {
+            display: grid;
+            grid-template-columns: 200px 150px 80px;
+            gap: 12px;
+            padding: 8px;
+            background: #1e293b;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            font-size: 12px;
+        }
+
+        .schema-column-name {
+            color: #38bdf8;
+            font-weight: 500;
+        }
+
+        .schema-column-type {
+            color: #fbbf24;
+            font-family: 'Courier New', monospace;
+        }
+
+        .schema-column-flags {
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .table-browser-editor {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            margin-top: 12px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .table-browser-editor .CodeMirror {
+            min-height: 100px;
+            max-height: 200px;
+        }
+
+        .table-browser-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #334155;
+        }
+
+        .btn-run-table {
+            background: #10b981;
+            color: #ffffff;
+        }
+
+        .btn-run-table:hover {
+            background: #059669;
+        }
+
+        /* Results Display Styles */
+        .table-browser-results {
+            margin-top: 12px;
+        }
+
+        .results-status {
+            background: #064e3b;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 12px;
+            color: #6ee7b7;
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .results-status.error {
+            background: #450a0a;
+            border: 1px solid #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .results-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid #334155;
+            border-radius: 8px;
+        }
+
+        .results-table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+        }
+
+        .results-table thead {
+            background: #0f172a;
+        }
+
+        .results-table thead th {
+            padding: 10px 12px;
+            text-align: left;
+            color: #94a3b8;
+            border-bottom: 2px solid #334155;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .results-table tbody tr {
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .results-table tbody tr:nth-child(even) {
+            background: #0f172a33;
+        }
+
+        .results-table tbody tr:hover {
+            background: #334155;
+        }
+
+        .results-table tbody td {
+            padding: 10px 12px;
+            color: #e2e8f0;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .results-table td.null-value {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* Light theme overrides for Show All Tables */
+        [data-theme="light"] .table-browser-item {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .table-browser-item:hover {
+            border-color: #cbd5e1;
+        }
+
+        [data-theme="light"] .table-browser-header {
+            background: #f8fafc;
+        }
+
+        [data-theme="light"] .table-browser-name {
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .table-browser-arrow {
+            color: #94a3b8;
+        }
+
+        [data-theme="light"] .table-browser-content {
+            border-top-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .schema-column {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #334155;
+        }
+
+        [data-theme="light"] .schema-column-name {
+            color: #0284c7;
+        }
+
+        [data-theme="light"] .schema-column-type {
+            color: #d97706;
+        }
+
+        [data-theme="light"] .schema-column-flags {
+            color: #94a3b8;
+        }
+
+        [data-theme="light"] .table-browser-editor {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .tab-button {
+            color: #64748b;
+        }
+
+        [data-theme="light"] .tab-button:hover {
+            color: #334155;
+        }
+
+        [data-theme="light"] .tab-button.active {
+            color: #0284c7;
+            border-bottom-color: #0284c7;
+        }
+
+        [data-theme="light"] .tabs-container {
+            border-bottom-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .tables-search-input {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .tables-search-input:focus {
+            border-color: #2563eb;
+        }
+
+        [data-theme="light"] .tables-search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        [data-theme="light"] .tables-list {
+            background: #ffffff;
+        }
+
+        [data-theme="light"] .tables-empty-state {
+            color: #94a3b8;
+        }
+
+        /* Light Theme Results Display */
+        [data-theme="light"] .results-status {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+        }
+
+        [data-theme="light"] .results-status.error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        [data-theme="light"] .results-table-wrapper {
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .results-table thead {
+            background: #f8fafc;
+        }
+
+        [data-theme="light"] .results-table thead th {
+            padding: 10px 12px;
+            text-align: left;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+        }
+
+        [data-theme="light"] .results-table tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        [data-theme="light"] .results-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        [data-theme="light"] .results-table tbody tr:hover {
+            background: #eef2ff;
+        }
+
+        [data-theme="light"] .results-table tbody td {
+            color: #0f172a;
+            padding: 10px 12px;
+        }
+
+        [data-theme="light"] .results-table td.null-value {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
         @media (max-width: 1024px) {
             .workspace-grid {
                 grid-template-columns: 1fr;
@@ -999,6 +1505,10 @@
 
             .sidebar {
                 position: static;
+            }
+
+            .schema-column {
+                grid-template-columns: 150px 120px 60px;
             }
         }
     </style>
@@ -1046,6 +1556,15 @@
     </aside>
 
     <main class="main-content">
+
+    {{-- Tabs Navigation --}}
+    <div class="tabs-container">
+        <button class="tab-button active" data-tab="editor">SQL Editor</button>
+        <button class="tab-button" data-tab="tables">Show All Tables</button>
+    </div>
+
+    {{-- Editor Tab --}}
+    <div id="editor-tab" class="tab-content active">
 
     {{-- Editor --}}
     <div class="editor-panel">
@@ -1137,12 +1656,32 @@
 
     {{-- Empty state --}}
     <div class="empty-state" id="empty-state">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="12" cy="5" rx="9" ry="3"/>
-            <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/>
-            <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/>
-        </svg>
-        <p>Writes an SQL query above and click <strong>Run Query</strong> to see results.</p>
+        <p>Execute a query to view results</p>
+    </div>
+
+    </div> {{-- End of editor-tab --}}
+
+    {{-- Show All Tables Tab --}}
+    <div id="tables-tab" class="tab-content">
+        <div class="tables-search-container">
+            <input 
+                type="text" 
+                id="tables-search" 
+                class="tables-search-input" 
+                placeholder="Search tables by name..."
+                autocomplete="off"
+            >
+        </div>
+        <div class="tables-list" id="tables-list">
+            <div class="tables-empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="9" x2="15" y2="9"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+                <p>Loading tables...</p>
+            </div>
+        </div>
     </div>
 
     </main>
@@ -1169,16 +1708,18 @@
     let savedQueries = [];
     let selectedSavedQueryId = null;
     let editorTheme = 'dracula';
-    let activeBackendCalls = 0;
     let availableTables = [];
     let selectedTables = [];
     let tableSearchQuery = '';
     let isPromptedQueryEnabled = false;
+    let activeBackendCalls = 0;
+    let tablesSearchQuery = '';
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const savedQueriesIndexUrl = "{{ route('sql-analyzer.saved-queries.index') }}";
     const savedQueriesStoreUrl = "{{ route('sql-analyzer.saved-queries.store') }}";
     const savedQueriesShowUrlTemplate = "{{ route('sql-analyzer.saved-queries.show', ['id' => '__ID__']) }}";
+    const savedQueriesDestroyUrlTemplate = "{{ route('sql-analyzer.saved-queries.destroy', ['id' => '__ID__']) }}";
 
     // ── DOM refs ───────────────────────────────────────────────────
     const btnRun        = document.getElementById('btn-run');
@@ -1212,6 +1753,29 @@
     const titleToQuerySection = document.getElementById('title-to-query-section');
     const enablePromptedQueryToggle = document.getElementById('enable-prompted-query');
     const selectedTablesList = document.getElementById('selected-tables-list');
+    const tablesList = document.getElementById('tables-list');
+    const tablesSearchInput = document.getElementById('tables-search');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // ── Tab navigation ────────────────────────────────────────────
+    function switchTab(tabName) {
+        tabButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tabName);
+        });
+        tabContents.forEach(content => {
+            content.classList.toggle('active', content.id === tabName + '-tab');
+        });
+        if (tabName === 'tables') {
+            loadShowAllTables();
+        }
+    }
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchTab(btn.dataset.tab);
+        });
+    });
 
     function getInitialTheme() {
         const storedTheme = localStorage.getItem('sql-analyzer-theme');
@@ -1303,7 +1867,7 @@
 
         savedQueryEmpty.style.display = 'none';
         savedQueryList.innerHTML = savedQueries.map((item) =>
-            '<li><button class="saved-query-item ' + (String(selectedSavedQueryId) === String(item.id) ? 'is-active' : '') + '" type="button" data-query-id="' + escapeAttr(String(item.id)) + '" title="' + escapeAttr(item.name) + '">' + escapeHtml(item.name) + '</button></li>'
+            '<li class="saved-query-item-wrapper"><button class="saved-query-item ' + (String(selectedSavedQueryId) === String(item.id) ? 'is-active' : '') + '" type="button" data-query-id="' + escapeAttr(String(item.id)) + '" title="' + escapeAttr(item.name) + '" style="flex: 1; text-align: left;">' + escapeHtml(item.name) + '</button><button class="btn-delete-query" type="button" data-query-id="' + escapeAttr(String(item.id)) + '" title="Delete this query" onclick="event.stopPropagation(); deleteSavedQuery(' + item.id + ');" data-action="delete">×</button></li>'
         ).join('');
     }
 
@@ -1348,6 +1912,48 @@
 
     function getSavedQueryShowUrl(id) {
         return savedQueriesShowUrlTemplate.replace('__ID__', encodeURIComponent(String(id)));
+    }
+
+    function getSavedQueryDestroyUrl(id) {
+        return savedQueriesDestroyUrlTemplate.replace('__ID__', encodeURIComponent(String(id)));
+    }
+
+    async function deleteSavedQuery(id) {
+        if (!confirm('Are you sure you want to delete this query?')) {
+            return;
+        }
+
+        try {
+            btnSaveQuery.disabled = true;
+
+            await withBackendLoading(async () => {
+                const response = await fetch(getSavedQueryDestroyUrl(id), {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    }
+                });
+
+                if (!response.ok) {
+                    const body = await response.json().catch(() => ({}));
+                    throw new Error(body.error || 'Unable to delete query.');
+                }
+            });
+
+            // If the deleted query was selected, clear it
+            if (String(selectedSavedQueryId) === String(id)) {
+                selectedSavedQueryId = null;
+            }
+
+            await loadSavedQueries();
+            renderSavedQueries();
+            updateSaveQueryState();
+        } catch (error) {
+            errorDiv.textContent = error.message || 'Unable to delete query.';
+            errorDiv.style.display = 'block';
+            updateSaveQueryState();
+        }
     }
 
     async function loadSavedQueryById(id) {
@@ -1442,8 +2048,8 @@
                 return await response.json();
             });
 
-            if (data.schema) {
-                schemaHints = data.schema;
+            if (data.autocomplete) {
+                schemaHints = data.autocomplete;
                 editor.setOption('hintOptions', {
                     completeSingle: false,
                     tables: schemaHints
@@ -1454,6 +2060,227 @@
     }
 
     loadSchemaHints();
+
+    // ── Show All Tables Feature ────────────────────────────────────
+    let allTablesSchema = {};
+
+    async function loadShowAllTables() {
+        if (!tablesList) return;
+        
+        try {
+            tablesList.innerHTML = '<div style="text-align: center; color: #64748b; padding: 24px;">Loading tables...</div>';
+
+            const data = await withBackendLoading(async () => {
+                const response = await fetch("{{ route('sql-analyzer.schema') }}", {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Unable to load tables schema.');
+                }
+
+                return await response.json();
+            });
+
+            if (!data.schema) {
+                tablesList.innerHTML = '<div style="text-align: center; color: #64748b; padding: 24px;">No tables available</div>';
+                return;
+            }
+
+            allTablesSchema = data.schema;
+            renderShowAllTables();
+        } catch (error) {
+            tablesList.innerHTML = '<div style="text-align: center; color: #fca5a5; padding: 24px;">Error loading tables: ' + escapeHtml(error.message) + '</div>';
+        }
+    }
+
+    function renderShowAllTables() {
+        if (!tablesList || Object.keys(allTablesSchema).length === 0) {
+            tablesList.innerHTML = '<div class="tables-empty-state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line></svg><p>No tables available</p></div>';
+            return;
+        }
+
+        const tableNames = Object.keys(allTablesSchema).sort();
+        
+        // Filter tables based on search query
+        const filteredTables = tableNames.filter(tableName =>
+            tableName.toLowerCase().includes(tablesSearchQuery.toLowerCase())
+        );
+
+        if (filteredTables.length === 0) {
+            tablesList.innerHTML = '<div class="tables-empty-state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg><p>No tables match your search</p></div>';
+            return;
+        }
+        
+        tablesList.innerHTML = filteredTables.map((tableName) => {
+            const columns = allTablesSchema[tableName] || [];
+            const tableId = 'table-' + tableName.replace(/[^a-zA-Z0-9-]/g, '-');
+            
+            return `
+                <div class="table-browser-item" id="${escapeAttr(tableId)}">
+                    <div class="table-browser-header" onclick="toggleTableExpand('${escapeAttr(tableId)}')">
+                        <div class="table-browser-name">
+                            <svg class="table-browser-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                            <span>${escapeHtml(tableName)}</span>
+                        </div>
+                    </div>
+                    <div class="table-browser-content">
+                        <div class="table-browser-editor" id="editor-${escapeAttr(tableId)}"></div>
+                        <div class="table-browser-actions">
+                            <button class="btn btn-run-table" onclick="runShowAllTableQuery('${escapeAttr(tableName)}', '${escapeAttr(tableId)}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                Execute Query
+                            </button>
+                        </div>
+                        <div id="results-${escapeAttr(tableId)}" style="margin-top: 12px; display: none;"></div>
+                        <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #334155;">
+                            <h4 style="font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Table Schema</h4>
+                            <div class="schema-grid">
+                                ${columns.map(col => `
+                                    <div class="schema-column">
+                                        <div class="schema-column-name">${escapeHtml(col.name)}</div>
+                                        <div class="schema-column-type">${escapeHtml(col.type)}</div>
+                                        <div class="schema-column-flags">
+                                            ${col.nullable ? 'NULL' : 'NOT NULL'}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Initialize editors for each table
+        setTimeout(() => {
+            tableNames.forEach((tableName) => {
+                const tableId = 'table-' + tableName.replace(/[^a-zA-Z0-9-]/g, '-');
+                const editorElement = document.getElementById('editor-' + tableId);
+                
+                if (editorElement && !editorElement.querySelector('.CodeMirror')) {
+                    // Convert detailed schema to autocomplete format
+                    const autocompleteSchema = {};
+                    Object.keys(allTablesSchema).forEach(tbl => {
+                        if (Array.isArray(allTablesSchema[tbl])) {
+                            autocompleteSchema[tbl] = allTablesSchema[tbl].map(col => col.name);
+                        }
+                    });
+                    
+                    const tableEditor = CodeMirror(editorElement, {
+                        mode: 'text/x-sql',
+                        theme: editorTheme,
+                        lineNumbers: true,
+                        matchBrackets: true,
+                        autoCloseBrackets: true,
+                        indentWithTabs: true,
+                        smartIndent: true,
+                        lineWrapping: true,
+                        value: 'SELECT * FROM ' + tableName + ' LIMIT 10;',
+                        hintOptions: {
+                            completeSingle: false,
+                            tables: autocompleteSchema
+                        },
+                        extraKeys: {
+                            'Ctrl-Space': 'autocomplete',
+                            'Ctrl-Enter': (cm) => runShowAllTableQuery(tableName, tableId),
+                            'Cmd-Enter': (cm) => runShowAllTableQuery(tableName, tableId)
+                        }
+                    });
+                    
+                    tableEditor.on('inputRead', function (cm, change) {
+                        if (change.origin !== '+input') return;
+                        const ch = change.text[0];
+                        if (/\w|\./.test(ch)) {
+                            cm.showHint({ completeSingle: false });
+                        }
+                    });
+                }
+            });
+        }, 0);
+    }
+
+    function toggleTableExpand(tableId) {
+        const item = document.getElementById(tableId);
+        if (item) {
+            item.classList.toggle('expanded');
+        }
+    }
+
+    async function runShowAllTableQuery(tableName, tableId) {
+        const editorElement = document.getElementById('editor-' + tableId);
+        const resultElement = document.getElementById('results-' + tableId);
+        
+        if (!editorElement || !resultElement) return;
+
+        const editor = editorElement.querySelector('.CodeMirror').CodeMirror;
+        const sql = editor.getValue().trim();
+
+        if (!sql) return;
+
+        try {
+            startBackendLoading();
+            
+            const response = await fetch("{{ route('sql-analyzer.execute') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ sql })
+            });
+
+            const body = await response.json();
+            stopBackendLoading();
+
+            if (!response.ok || body.error) {
+                resultElement.innerHTML = '<div class="results-status error">Error: ' + escapeHtml(body.error || 'Unknown error') + '</div>';
+                resultElement.style.display = 'block';
+                return;
+            }
+
+            const data = body.data || [];
+
+            if (data.length === 0) {
+                resultElement.innerHTML = '<div class="results-status">Query executed successfully with 0 rows returned</div>';
+                resultElement.style.display = 'block';
+                return;
+            }
+
+            const columns = Object.keys(data[0]);
+            const rows = data.slice(0, 25);
+
+            let html = '<div class="table-browser-results">' +
+                      '<div class="results-status">' + 
+                      data.length + ' row' + (data.length !== 1 ? 's' : '') + ' returned (showing first 25)</div>';
+            
+            html += '<div class="results-table-wrapper"><table class="results-table">';
+            html += '<thead><tr>' + 
+                    columns.map(c => '<th>' + escapeHtml(c) + '</th>').join('') +
+                    '</tr></thead>';
+            html += '<tbody>' +
+                    rows.map(row => '<tr>' +
+                        columns.map(c => {
+                            const val = row[c];
+                            if (val === null || val === undefined) {
+                                return '<td class="null-value">NULL</td>';
+                            }
+                            return '<td>' + escapeHtml(String(val)) + '</td>';
+                        }).join('') +
+                    '</tr>').join('') +
+                    '</tbody></table></div></div>';
+
+            resultElement.innerHTML = html;
+            resultElement.style.display = 'block';
+        } catch (error) {
+            resultElement.innerHTML = '<div class="results-status error">Network error: ' + escapeHtml(error.message) + '</div>';
+            resultElement.style.display = 'block';
+            stopBackendLoading();
+        }
+    }
 
     async function loadAvailableTables() {
         try {
@@ -1523,6 +2350,14 @@
     }
 
     loadAvailableTables();
+
+    // Add search event listener for Show All Tables
+    if (tablesSearchInput) {
+        tablesSearchInput.addEventListener('input', function () {
+            tablesSearchQuery = this.value;
+            renderShowAllTables();
+        });
+    }
 
     function renderSelectedTablesSidebar() {
         if (!selectedTablesList) return;
@@ -1912,6 +2747,11 @@
     function escapeAttr(str) {
         return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
+
+    // Expose functions globally for inline onclick handlers
+    window.toggleTableExpand = toggleTableExpand;
+    window.deleteSavedQuery = deleteSavedQuery;
+    window.runShowAllTableQuery = runShowAllTableQuery;
 })();
 </script>
 </body>

@@ -53,12 +53,17 @@ class SqlAnalyzerController extends Controller
         try {
             $tables = $this->executor->getTables();
             $schema = [];
+            $autocompleteSchema = [];
 
             foreach ($tables as $table) {
-                $schema[$table] = $this->executor->getColumns($table);
+                $columns = $this->executor->getColumns($table);
+                $schema[$table] = $columns;
+                
+                // For autocomplete, we need just column names
+                $autocompleteSchema[$table] = array_column($columns, 'name');
             }
 
-            return response()->json(['schema' => $schema]);
+            return response()->json(['schema' => $schema, 'autocomplete' => $autocompleteSchema]);
         } catch (\Throwable $e) {
             return response()->json([
                 'error' => $e->getMessage(),
@@ -114,6 +119,19 @@ class SqlAnalyzerController extends Controller
 
         return response()->json([
             'data' => $query,
+        ]);
+    }
+
+    /**
+     * Delete a saved query by id.
+     */
+    public function deleteSavedQuery(int $id): JsonResponse
+    {
+        $query = SavedQuery::query()->findOrFail($id);
+        $query->delete();
+
+        return response()->json([
+            'message' => 'Query deleted successfully',
         ]);
     }
 

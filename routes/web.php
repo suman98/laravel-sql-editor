@@ -15,4 +15,5 @@ Route::group([
     Route::get('/saved-queries', [SqlAnalyzerController::class, 'savedQueries'])->name('sql-analyzer.saved-queries.index');
     Route::post('/saved-queries', [SqlAnalyzerController::class, 'saveQuery'])->name('sql-analyzer.saved-queries.store');
     Route::get('/saved-queries/{id}', [SqlAnalyzerController::class, 'getSavedQuery'])->name('sql-analyzer.saved-queries.show');
+    Route::delete('/saved-queries/{id}', [SqlAnalyzerController::class, 'deleteSavedQuery'])->name('sql-analyzer.saved-queries.destroy');
 });

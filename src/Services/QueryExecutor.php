@@ -87,7 +87,7 @@ class QueryExecutor
     }
 
     /**
-     * Retrieve column names for a given table.
+     * Retrieve column metadata for a given table.
      */
     public function getColumns(string $table): array
     {
@@ -98,22 +98,56 @@ class QueryExecutor
         $driver = $db->getDriverName();
 
         return match ($driver) {
-            'mysql', 'mariadb' => array_column(
-                array_map(fn ($r) => (array) $r, $db->select("SHOW COLUMNS FROM `{$table}`")),
-                'Field'
+            'mysql', 'mariadb' => array_map(
+                function ($row) {
+                    $row = (array) $row;
+                    return [
+                        'name' => $row['Field'],
+                        'type' => strtoupper(explode('(', $row['Type'])[0]),
+                        'nullable' => $row['Null'] === 'YES',
+                        'key' => $row['Key'] ?? null,
+                    ];
+                },
+                $db->select("SHOW COLUMNS FROM `{$table}`")
             ),
-            'pgsql' => array_column(
-                array_map(fn ($r) => (array) $r, $db->select(
-                    "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = ?",
+            'pgsql' => array_map(
+                function ($row) {
+                    $row = (array) $row;
+                    return [
+                        'name' => $row['column_name'],
+                        'type' => strtoupper($row['data_type']),
+                        'nullable' => $row['is_nullable'] === 'YES',
+                        'key' => null,
+                    ];
+                },
+                $db->select(
+                    "SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = ? ORDER BY ordinal_position",
                     [$table]
-                )),
-                'column_name'
+                )
             ),
-            'sqlite' => array_column(
-                array_map(fn ($r) => (array) $r, $db->select("PRAGMA table_info(`{$table}`)")),
-                'name'
+            'sqlite' => array_map(
+                function ($row) {
+                    $row = (array) $row;
+                    return [
+                        'name' => $row['name'],
+                        'type' => strtoupper($row['type']),
+                        'nullable' => $row['notnull'] == 0,
+                        'key' => $row['pk'] ? 'PRI' : null,
+                    ];
+                },
+                $db->select("PRAGMA table_info(`{$table}`)")
             ),
-            default => $db->getSchemaBuilder()->getColumnListing($table),
+            default => array_map(
+                function ($column) {
+                    return [
+                        'name' => $column->getName(),
+                        'type' => strtoupper($column->getType()->getName()),
+                        'nullable' => !$column->getNotnull(),
+                        'key' => null,
+                    ];
+                },
+                $db->getSchemaBuilder()->getColumns($table)
+            ),
         };
     }
 
