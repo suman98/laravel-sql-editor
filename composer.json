@@ -1,5 +1,5 @@
 {
-    "name": "sql-analyzer/sql-analyzer",
+    "name": "suman/sql-analyzer",
     "description": "A Laravel package for an SQL editor and visualizer with autocomplete and paginated results.",
     "type": "library",
     "license": "MIT",
