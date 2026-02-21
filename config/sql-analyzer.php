@@ -29,7 +29,7 @@ return [
     | The URI prefix for all SQL Analyzer routes.
     |
     */
-    'prefix' => env('SQL_ANALYZER_ROOT_URL', null),,
+    'prefix' => env('SQL_ANALYZER_ROOT_URL', 'sql-editor'),
 
     /*
     |--------------------------------------------------------------------------
