@@ -10,9 +10,6 @@ return [
     | Force a root URL for all generated package URLs.
     | Leave null to use the application's default URL.
     |
-    */
-    'root_url' => env('SQL_ANALYZER_ROOT_URL', null),
-
     /*
     |--------------------------------------------------------------------------
     | OpenAI API Key
@@ -32,7 +29,7 @@ return [
     | The URI prefix for all SQL Analyzer routes.
     |
     */
-    'prefix' => 'sql-analyzer',
+    'prefix' => env('SQL_ANALYZER_ROOT_URL', null),,
 
     /*
     |--------------------------------------------------------------------------
