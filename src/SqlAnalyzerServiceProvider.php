@@ -13,6 +13,10 @@ class SqlAnalyzerServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         if ($this->app->runningInConsole()) {
+            $this->commands([
+                Console\Commands\InstallCommand::class,
+            ]);
+
             $this->publishes([
                 __DIR__ . '/../config/sql-analyzer.php' => config_path('sql-analyzer.php'),
             ], 'sql-analyzer-config');

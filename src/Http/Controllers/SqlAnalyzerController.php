@@ -6,7 +6,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use SqlAnalyzer\Models\SavedQuery;
+use SqlAnalyzer\Services\PythonEnvironment;
 use SqlAnalyzer\Services\QueryExecutor;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class SqlAnalyzerController extends Controller
 {
@@ -112,5 +115,63 @@ class SqlAnalyzerController extends Controller
         return response()->json([
             'data' => $query,
         ]);
+    }
+
+    /**
+     * Generate SQL query from natural language title using LangChain AI.
+     */
+    public function generateQueryFromTitle(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $title = $request->input('title');
+            
+            // Resolve package path (not app path)
+            // __FILE__ = src/Http/Controllers/SqlAnalyzerController.php
+            // dirname(__FILE__, 3) = package root
+            $packageRoot = dirname(__FILE__, levels: 4);
+            $pythonScriptPath = $packageRoot . '/python/get_sql_response.py';
+
+            if (!file_exists($pythonScriptPath)) {
+                return response()->json([
+                    'error' => 'Python script not found.',
+                ], 422);
+            }
+
+            $pythonExecutable = PythonEnvironment::getPythonExecutable();
+        
+            $payload = json_encode([
+                'user_question' => $title,
+                'prompt_template' => null,
+            ]);
+
+            $process = new Process([
+                $pythonExecutable,
+                $pythonScriptPath,
+                $payload,
+            ]);
+
+            $process->setTimeout(30);
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            $output = trim($process->getOutput());
+
+            return response()->json([
+                'data' => [
+                    'sql' => $output,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Failed to generate query: ' . $e->getMessage(),
+            ], 422);
+        }
     }
 }

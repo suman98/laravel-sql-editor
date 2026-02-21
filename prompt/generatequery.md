@@ -1,8 +1,8 @@
-generateQueryFromTitle
+generateQueryFromTitle in [file](/resources/views/editor.blade.php)
 
 Replace this method with this script using symphony process and add the response in the sql editor 
 
-
+[folder](../python/)
 ```python
 import os
 from langchain_openai import ChatOpenAI
@@ -15,7 +15,7 @@ from src.database.session import DATABASE_URL
 
 # Default prompt template for SQLDatabaseChain
 DEFAULT_PROMPT_TEMPLATE = """
-You are a database financial assistant. You can answer questions using only the following table(s): {table_info}.
+You are a database  assistant. You can answer questions using only the following table(s): {table_info}.
 Only write SQL queries using the allowed tables: {table_info}.
 - Do not hallucinate about tables or fields that do not exist.
 - Try to answer best possible answer using the table(s) {table_info}

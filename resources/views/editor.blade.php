@@ -1198,98 +1198,34 @@
 
     loadSchemaHints();
 
-    function normalizeText(text) {
-        return String(text || '').toLowerCase().replace(/[^a-z0-9_ ]+/g, ' ').replace(/\s+/g, ' ').trim();
-    }
-
-    function singularize(word) {
-        if (word.endsWith('ies')) return word.slice(0, -3) + 'y';
-        if (word.endsWith('ses')) return word.slice(0, -2);
-        if (word.endsWith('s') && word.length > 3) return word.slice(0, -1);
-        return word;
-    }
-
-    function pickBestTableFromTitle(title) {
-        const words = normalizeText(title).split(' ').filter(Boolean);
-        const tableNames = Object.keys(schemaHints || {});
-        if (!tableNames.length) return null;
-
-        let bestTable = tableNames[0];
-        let bestScore = -1;
-
-        tableNames.forEach((table) => {
-            const normalizedTable = normalizeText(table);
-            const tableTokens = normalizedTable.split(/[_\s]+/).filter(Boolean);
-            let score = 0;
-
-            words.forEach((word) => {
-                const singularWord = singularize(word);
-                if (normalizedTable.includes(word)) score += 3;
-                if (normalizedTable.includes(singularWord)) score += 2;
-                tableTokens.forEach((token) => {
-                    if (token === word || token === singularWord) score += 4;
-                    if (token.includes(word) || token.includes(singularWord)) score += 1;
-                });
-            });
-
-            if (score > bestScore) {
-                bestScore = score;
-                bestTable = table;
-            }
-        });
-
-        return bestScore > 0 ? bestTable : tableNames[0];
-    }
-
-    function pickColumns(table) {
-        const columns = schemaHints[table] || [];
-        const preferred = ['id', 'name', 'title', 'email', 'status', 'created_at', 'updated_at'];
-        const selected = preferred.filter((column) => columns.includes(column));
-        if (selected.length >= 3) return selected.slice(0, 6);
-        return columns.slice(0, Math.min(6, columns.length));
-    }
-
-    function extractLimitFromTitle(title) {
-        const match = normalizeText(title).match(/\b(\d{1,4})\b/);
-        if (!match) return 50;
-        const parsed = parseInt(match[1], 10);
-        if (Number.isNaN(parsed)) return 50;
-        return Math.max(1, Math.min(parsed, 1000));
-    }
-
-    function generateQueryFromTitle() {
+    async function generateQueryFromTitle() {
         const title = queryTitleInput.value.trim();
         if (!title) return;
 
-        const table = pickBestTableFromTitle(title);
-        if (!table) return;
+        const { ok, body } = await withBackendLoading(async () => {
+            const response = await fetch("{{ route('sql-analyzer.generate-query') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ title })
+            });
 
-        const columns = pickColumns(table);
-        const normalizedTitle = normalizeText(title);
-        const limit = extractLimitFromTitle(title);
-        const tableColumns = schemaHints[table] || [];
-        const hasCreatedAt = tableColumns.includes('created_at');
+            const body = await response.json();
+            return { ok: response.ok, body };
+        });
 
-        let sql;
-        if (/\b(count|total|how many)\b/.test(normalizedTitle)) {
-            sql = 'SELECT COUNT(*) AS total\nFROM ' + table + ';';
-        } else {
-            const selectColumns = columns.length ? columns.join(', ') : '*';
-            sql = 'SELECT ' + selectColumns + '\nFROM ' + table;
+        if (!ok || body.error) {
+            alert('Error generating query: ' + (body.error || 'Unknown error'));
+            return;
+        }
 
-            if (/\b(active)\b/.test(normalizedTitle)) {
-                if (tableColumns.includes('is_active')) {
-                    sql += '\nWHERE is_active = 1';
-                } else if (tableColumns.includes('status')) {
-                    sql += "\nWHERE status = 'active'";
-                }
-            }
-
-            if (/\b(latest|recent|newest|last)\b/.test(normalizedTitle) && hasCreatedAt) {
-                sql += '\nORDER BY created_at DESC';
-            }
-
-            sql += '\nLIMIT ' + limit + ';';
+        const sql = body.data?.sql || '';
+        if (!sql) {
+            alert('No SQL generated. Please try a different query description.');
+            return;
         }
 
         editor.setValue(sql);
