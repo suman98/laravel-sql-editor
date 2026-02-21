@@ -13,7 +13,7 @@ A Laravel package that provides a SQL editor UI with query execution, saved quer
 1) Require the package (local path or VCS):
 
 ```bash
-composer require suman98/laravel-sql-editor
+composer require suman/laravel-sql-editor
 ```
 
 2) Publish package assets:
