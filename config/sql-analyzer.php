@@ -46,6 +46,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Only Retrieve Data Command
+    |--------------------------------------------------------------------------
+    |
+    | When true, only retrieve-data commands are allowed. Any non-retrieve
+    | command will be blocked before execution.
+    |
+    */
+    'only_retrive_data_command' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retrieve Data Commands
+    |--------------------------------------------------------------------------
+    |
+    | Statement types treated as read-only data retrieval commands.
+    |
+    */
+    'retrieve_data_commands' => ['select', 'show', 'describe', 'desc', 'with', 'explain'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Allowed Statements
     |--------------------------------------------------------------------------
     |

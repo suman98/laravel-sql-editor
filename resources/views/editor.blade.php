@@ -45,6 +45,15 @@
             color: #38bdf8;
         }
 
+        .theme-toggle {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        .theme-toggle:hover {
+            background: #475569;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -96,6 +105,11 @@
             transition: all 0.15s ease;
         }
 
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
         .btn-primary {
             background: #2563eb;
             color: #fff;
@@ -120,15 +134,33 @@
             background: #475569;
         }
 
+        .btn-format {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        .btn-format:hover {
+            background: #475569;
+        }
+
         .btn svg {
             width: 16px;
             height: 16px;
         }
 
         .CodeMirror {
-            height: 220px;
+            height: auto;
+            min-height: 220px;
+            max-height: none;
             font-size: 14px;
             line-height: 1.6;
+        }
+
+        .CodeMirror-scroll {
+            min-height: 220px;
+            max-height: none;
+            overflow-y: hidden;
+            overflow-x: auto !important;
         }
 
         .keyboard-hint {
@@ -389,6 +421,134 @@
             background: #2563eb !important;
             color: #fff !important;
         }
+
+        [data-theme="light"] body {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .app-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        [data-theme="light"] .app-header h1 {
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .theme-toggle,
+        [data-theme="light"] .btn-clear,
+        [data-theme="light"] .btn-format {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        [data-theme="light"] .theme-toggle:hover,
+        [data-theme="light"] .btn-clear:hover,
+        [data-theme="light"] .btn-format:hover {
+            background: #cbd5e1;
+        }
+
+        [data-theme="light"] .editor-panel,
+        [data-theme="light"] .status-bar,
+        [data-theme="light"] .results-panel {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .editor-toolbar,
+        [data-theme="light"] .results-header,
+        [data-theme="light"] .pagination-bar {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .editor-toolbar .label,
+        [data-theme="light"] .results-header .label,
+        [data-theme="light"] .pagination-info,
+        [data-theme="light"] .status-bar,
+        [data-theme="light"] .empty-state,
+        [data-theme="light"] td.null-value {
+            color: #64748b;
+        }
+
+        [data-theme="light"] .keyboard-hint {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        [data-theme="light"] .keyboard-hint kbd {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        [data-theme="light"] .error-message {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        [data-theme="light"] thead th {
+            background: #f8fafc;
+            color: #64748b;
+            border-bottom-color: #e2e8f0;
+        }
+
+        [data-theme="light"] tbody tr {
+            border-bottom-color: #eef2f7;
+        }
+
+        [data-theme="light"] tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        [data-theme="light"] tbody tr:hover {
+            background: #eef2ff;
+        }
+
+        [data-theme="light"] tbody td {
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .pagination-controls button,
+        [data-theme="light"] .page-size-select {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+
+        [data-theme="light"] .pagination-controls button:hover:not(:disabled) {
+            background: #cbd5e1;
+        }
+
+        [data-theme="light"] .pagination-controls button:disabled {
+            color: #94a3b8;
+        }
+
+        [data-theme="light"] .spinner {
+            border-color: #e2e8f0;
+            border-top-color: #2563eb;
+        }
+
+        [data-theme="light"] .CodeMirror {
+            background: #ffffff;
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .CodeMirror-gutters {
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        [data-theme="light"] .CodeMirror-hints {
+            background: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12) !important;
+        }
+
+        [data-theme="light"] .CodeMirror-hint {
+            color: #334155 !important;
+        }
     </style>
 </head>
 <body>
@@ -402,6 +562,7 @@
         </svg>
         SQL Analyzer
     </h1>
+    <button class="btn theme-toggle" id="btn-theme" title="Toggle dark and light mode">Light Mode</button>
 </header>
 
 <div class="container">
@@ -411,6 +572,10 @@
         <div class="editor-toolbar">
             <span class="label">SQL Editor</span>
             <div class="toolbar-actions">
+                <button class="btn btn-format" id="btn-format" title="Format SQL (Shift+Alt+F)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h10"/><path d="M4 17h12"/></svg>
+                    Format
+                </button>
                 <button class="btn btn-clear" id="btn-clear" title="Clear editor">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M5 6l1 14h12l1-14"/></svg>
                     Clear
@@ -423,7 +588,7 @@
         </div>
         <textarea id="sql-editor"></textarea>
         <div class="keyboard-hint">
-            <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run &nbsp;|&nbsp; <kbd>Ctrl</kbd>+<kbd>Space</kbd> for autocomplete
+            <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run &nbsp;|&nbsp; <kbd>Ctrl</kbd>+<kbd>Space</kbd> for autocomplete &nbsp;|&nbsp; <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>F</kbd> to format
         </div>
     </div>
 
@@ -447,6 +612,12 @@
         <div class="results-header">
             <span class="label">Results</span>
             <div style="display:flex;align-items:center;gap:10px;">
+                <button class="btn btn-clear" id="btn-export-csv" title="Export all rows as CSV" disabled>
+                    Export CSV
+                </button>
+                <button class="btn btn-clear" id="btn-export-json" title="Export all rows as JSON" disabled>
+                    Export JSON
+                </button>
                 <label class="pagination-info" for="page-size">Rows per page:</label>
                 <select class="page-size-select" id="page-size">
                     <option value="10">10</option>
@@ -487,6 +658,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sql-formatter@15.4.2/dist/sql-formatter.min.js"></script>
 
 <script>
 (function () {
@@ -500,7 +672,11 @@
 
     // ── DOM refs ───────────────────────────────────────────────────
     const btnRun        = document.getElementById('btn-run');
+    const btnTheme      = document.getElementById('btn-theme');
+    const btnFormat     = document.getElementById('btn-format');
     const btnClear      = document.getElementById('btn-clear');
+    const btnExportCsv  = document.getElementById('btn-export-csv');
+    const btnExportJson = document.getElementById('btn-export-json');
     const statusBar     = document.getElementById('status-bar');
     const statusBadge   = document.getElementById('status-badge');
     const statusRows    = document.getElementById('status-rows');
@@ -515,10 +691,28 @@
     const pageSizeSelect = document.getElementById('page-size');
     const emptyState    = document.getElementById('empty-state');
 
+    function getInitialTheme() {
+        const storedTheme = localStorage.getItem('sql-analyzer-theme');
+
+        if (storedTheme === 'dark' || storedTheme === 'light') {
+            return storedTheme;
+        }
+
+        return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+
+    function setDocumentTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        btnTheme.textContent = theme === 'light' ? 'Dark Mode' : 'Light Mode';
+    }
+
+    const initialTheme = getInitialTheme();
+    setDocumentTheme(initialTheme);
+
     // ── CodeMirror ─────────────────────────────────────────────────
     const editor = CodeMirror.fromTextArea(document.getElementById('sql-editor'), {
         mode: 'text/x-sql',
-        theme: 'dracula',
+        theme: initialTheme === 'light' ? 'default' : 'dracula',
         lineNumbers: true,
         matchBrackets: true,
         autoCloseBrackets: true,
@@ -532,9 +726,19 @@
         extraKeys: {
             'Ctrl-Space': 'autocomplete',
             'Ctrl-Enter': runQuery,
-            'Cmd-Enter': runQuery
+            'Cmd-Enter': runQuery,
+            'Shift-Alt-F': formatSQL,
+            'Shift-Cmd-F': formatSQL
         }
     });
+
+    function refreshEditorHeight() {
+        editor.setSize(null, 'auto');
+        editor.refresh();
+    }
+
+    refreshEditorHeight();
+    editor.on('change', refreshEditorHeight);
 
     // trigger autocomplete on key input
     editor.on('inputRead', function (cm, change) {
@@ -571,6 +775,8 @@
         resultsPanel.style.display = 'none';
         emptyState.style.display = 'none';
         statusBar.style.display = 'none';
+        btnExportCsv.disabled = true;
+        btnExportJson.disabled = true;
         loadingDiv.style.display = 'flex';
         btnRun.disabled = true;
 
@@ -595,6 +801,8 @@
                 statusBadge.innerHTML = '<span class="badge badge-error">Error</span>';
                 statusRows.textContent = '';
                 statusTime.textContent = '';
+                btnExportCsv.disabled = true;
+                btnExportJson.disabled = true;
                 return;
             }
 
@@ -610,8 +818,13 @@
             if (allData.length === 0) {
                 emptyState.style.display = 'block';
                 emptyState.querySelector('p').textContent = 'Query executed successfully but returned no rows.';
+                btnExportCsv.disabled = true;
+                btnExportJson.disabled = true;
                 return;
             }
+
+            btnExportCsv.disabled = false;
+            btnExportJson.disabled = false;
 
             renderTable();
         })
@@ -620,6 +833,8 @@
             btnRun.disabled = false;
             errorDiv.textContent = 'Network error: ' + err.message;
             errorDiv.style.display = 'block';
+            btnExportCsv.disabled = true;
+            btnExportJson.disabled = true;
         });
     }
 
@@ -728,8 +943,78 @@
         if (allData.length > 0) renderTable();
     });
 
+    // ── Format SQL ────────────────────────────────────────────────
+    function formatSQL() {
+        const sql = editor.getValue().trim();
+        if (!sql) return;
+        try {
+            const formatted = sqlFormatter.format(sql, {
+                language: 'sql',
+                tabWidth: 2,
+                keywordCase: 'upper',
+                linesBetweenQueries: 2
+            });
+            editor.setValue(formatted);
+        } catch (e) {
+            // silently ignore formatting errors
+        }
+    }
+
+    function exportToJson() {
+        if (!allData.length) return;
+
+        const fileContent = JSON.stringify(allData, null, 2);
+        downloadFile(fileContent, 'application/json;charset=utf-8;', 'query-results.json');
+    }
+
+    function exportToCsv() {
+        if (!allData.length) return;
+
+        const columns = Object.keys(allData[0]);
+        const header = columns.join(',');
+        const rows = allData.map((row) => columns.map((column) => toCsvCell(row[column])).join(','));
+        const csvContent = [header, ...rows].join('\n');
+
+        downloadFile(csvContent, 'text/csv;charset=utf-8;', 'query-results.csv');
+    }
+
+    function toCsvCell(value) {
+        if (value === null || value === undefined) {
+            return '""';
+        }
+
+        const normalized = String(value).replace(/"/g, '""').replace(/\r?\n|\r/g, ' ');
+        return '"' + normalized + '"';
+    }
+
+    function downloadFile(content, mimeType, filename) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+    }
+
     // ── Button handlers ────────────────────────────────────────────
     btnRun.addEventListener('click', runQuery);
+    btnTheme.addEventListener('click', function () {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+        setDocumentTheme(nextTheme);
+        localStorage.setItem('sql-analyzer-theme', nextTheme);
+        editor.setOption('theme', nextTheme === 'light' ? 'default' : 'dracula');
+        refreshEditorHeight();
+    });
+    btnFormat.addEventListener('click', formatSQL);
+    btnExportCsv.addEventListener('click', exportToCsv);
+    btnExportJson.addEventListener('click', exportToJson);
     btnClear.addEventListener('click', function () {
         editor.setValue('');
         editor.focus();

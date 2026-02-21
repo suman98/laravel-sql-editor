@@ -10,7 +10,9 @@ class QueryExecutor
     public function __construct(
         protected ?string $connection,
         protected int $maxRows,
-        protected array $allowedStatements
+        protected array $allowedStatements,
+        protected bool $onlyRetriveDataCommand,
+        protected array $retrieveDataCommands
     ) {}
 
     /**
@@ -52,7 +54,7 @@ class QueryExecutor
     }
 
     /**
-     * Retrieve all table names from the current database connection.
+     * Retrieve all table names from the configured database only.
      */
     public function getTables(): array
     {
@@ -60,9 +62,28 @@ class QueryExecutor
             ? DB::connection($this->connection)
             : DB::connection();
 
-        $schemaBuilder = $db->getSchemaBuilder();
+        $database = $db->getDatabaseName();
+        $driver = $db->getDriverName();
 
-        return $schemaBuilder->getTableListing();
+        return match ($driver) {
+            'mysql', 'mariadb' => array_map(
+                fn ($row) => $row->{'Tables_in_' . $database},
+                $db->select('SHOW TABLES')
+            ),
+            'pgsql' => array_column(
+                array_map(fn ($r) => (array) $r, $db->select(
+                    "SELECT tablename FROM pg_tables WHERE schemaname = 'public'"
+                )),
+                'tablename'
+            ),
+            'sqlite' => array_column(
+                array_map(fn ($r) => (array) $r, $db->select(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+                )),
+                'name'
+            ),
+            default => $db->getSchemaBuilder()->getTableListing(),
+        };
     }
 
     /**
@@ -74,9 +95,26 @@ class QueryExecutor
             ? DB::connection($this->connection)
             : DB::connection();
 
-        $schemaBuilder = $db->getSchemaBuilder();
+        $driver = $db->getDriverName();
 
-        return $schemaBuilder->getColumnListing($table);
+        return match ($driver) {
+            'mysql', 'mariadb' => array_column(
+                array_map(fn ($r) => (array) $r, $db->select("SHOW COLUMNS FROM `{$table}`")),
+                'Field'
+            ),
+            'pgsql' => array_column(
+                array_map(fn ($r) => (array) $r, $db->select(
+                    "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = ?",
+                    [$table]
+                )),
+                'column_name'
+            ),
+            'sqlite' => array_column(
+                array_map(fn ($r) => (array) $r, $db->select("PRAGMA table_info(`{$table}`)")),
+                'name'
+            ),
+            default => $db->getSchemaBuilder()->getColumnListing($table),
+        };
     }
 
     /**
@@ -84,11 +122,21 @@ class QueryExecutor
      */
     protected function validateStatement(string $sql): void
     {
-        if (in_array('*', $this->allowedStatements, true)) {
+        $firstWord = strtolower(strtok($sql, " \t\n\r"));
+
+        if ($this->onlyRetriveDataCommand) {
+            if (! in_array($firstWord, $this->retrieveDataCommands, true)) {
+                throw new InvalidArgumentException(
+                    "Only retrieve-data commands are allowed. Allowed: " . implode(', ', $this->retrieveDataCommands)
+                );
+            }
+
             return;
         }
 
-        $firstWord = strtolower(strtok($sql, " \t\n\r"));
+        if (in_array('*', $this->allowedStatements, true)) {
+            return;
+        }
 
         if (! in_array($firstWord, $this->allowedStatements, true)) {
             throw new InvalidArgumentException(

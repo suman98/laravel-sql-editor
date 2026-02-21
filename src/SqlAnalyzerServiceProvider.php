@@ -33,7 +33,9 @@ class SqlAnalyzerServiceProvider extends ServiceProvider
             return new Services\QueryExecutor(
                 config('sql-analyzer.connection'),
                 config('sql-analyzer.max_rows', 1000),
-                config('sql-analyzer.allowed_statements', ['select'])
+                config('sql-analyzer.allowed_statements', ['select']),
+                config('sql-analyzer.only_retrive_data_command', config('sql-analyzer.only_retrieve_data_command', true)),
+                config('sql-analyzer.retrieve_data_commands', ['select', 'show', 'describe', 'desc', 'with', 'explain'])
             );
         });
     }
