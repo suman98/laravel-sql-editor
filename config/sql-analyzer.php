@@ -4,6 +4,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Root URL
+    |--------------------------------------------------------------------------
+    |
+    | Force a root URL for all generated package URLs.
+    | Leave null to use the application's default URL.
+    |
+    */
+    'root_url' => env('SQL_ANALYZER_ROOT_URL', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | OpenAI API Key
+    |--------------------------------------------------------------------------
+    |
+    | Optional override for the OpenAI API key used by the Python agent.
+    | Falls back to OPENAI_API_KEY when not set.
+    |
+    */
+    'openai_api_key' => env('SQL_ANALYZER_OPENAI_API_KEY', env('OPENAI_API_KEY')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Route Prefix
     |--------------------------------------------------------------------------
     |

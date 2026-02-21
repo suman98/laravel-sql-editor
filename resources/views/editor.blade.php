@@ -160,6 +160,64 @@
             padding: 4px 2px;
         }
 
+        .sidebar-section {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #334155;
+        }
+
+        .sidebar-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 10px;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            background: #0f172a;
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            color: #e2e8f0;
+        }
+
+        .toggle-input {
+            width: 16px;
+            height: 16px;
+            accent-color: #0ea5e9;
+            cursor: pointer;
+        }
+
+        .selected-tables-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .selected-table-chip {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .selected-tables-empty {
+            font-size: 12px;
+            color: #64748b;
+        }
+
         .main-content {
             min-width: 0;
         }
@@ -197,11 +255,17 @@
             gap: 10px;
         }
 
+        .title-to-query-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 12px 16px 0;
+        }
+
         .title-to-query {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 12px 16px 0;
             padding: 10px;
             border: 1px solid #334155;
             border-radius: 10px;
@@ -222,6 +286,96 @@
 
         .title-to-query-input:focus {
             border-color: #2563eb;
+        }
+
+        .table-selector-wrapper {
+            padding: 10px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            background: #0f172a;
+        }
+
+        .table-selector-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table-selector-search {
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .table-selector-search:focus {
+            border-color: #2563eb;
+        }
+
+        .table-selector-search::placeholder {
+            color: #64748b;
+        }
+
+        .table-selector-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .table-selector-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .table-selector-item:hover {
+            border-color: #475569;
+            background: #334155;
+        }
+
+        .table-selector-item input[type="checkbox"] {
+            cursor: pointer;
+            margin: 0;
+            accent-color: #0ea5e9;
+        }
+
+        .table-selector-item.selected {
+            background: #1e3a8a;
+            border-color: #3b82f6;
+            color: #bfdbfe;
+        }
+
+        .table-selector-empty {
+            font-size: 12px;
+            color: #64748b;
+            padding: 8px 0;
+        }
+
+        .table-selector-loading {
+            font-size: 12px;
+            color: #64748b;
+            padding: 8px 0;
         }
 
         .btn-generate {
@@ -666,6 +820,78 @@
             border-color: #cbd5e1;
         }
 
+        [data-theme="light"] .table-selector-wrapper {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .table-selector-label {
+            color: #64748b;
+        }
+
+        [data-theme="light"] .table-selector-item {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+
+        [data-theme="light"] .table-selector-item:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        [data-theme="light"] .table-selector-item.selected {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e3a8a;
+        }
+
+        [data-theme="light"] .table-selector-empty,
+        [data-theme="light"] .table-selector-loading {
+            color: #64748b;
+        }
+
+        [data-theme="light"] .table-selector-search {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .table-selector-search:focus {
+            border-color: #2563eb;
+        }
+
+        [data-theme="light"] .table-selector-search::placeholder {
+            color: #94a3b8;
+        }
+
+        [data-theme="light"] .sidebar-section {
+            border-top-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .sidebar-section-title {
+            color: #64748b;
+        }
+
+        [data-theme="light"] .toggle-row {
+            background: #ffffff;
+            border-color: #cbd5e1;
+        }
+
+        [data-theme="light"] .toggle-label {
+            color: #334155;
+        }
+
+        [data-theme="light"] .selected-table-chip {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+
+        [data-theme="light"] .selected-tables-empty {
+            color: #94a3b8;
+        }
+
         [data-theme="light"] .saved-query-item {
             background: #f8fafc;
             color: #334155;
@@ -804,6 +1030,19 @@
         </div>
         <ul id="saved-query-list" class="saved-query-list"></ul>
         <div id="saved-query-empty" class="saved-query-empty">No saved queries yet.</div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Prompted Query</div>
+            <div class="toggle-row">
+                <span class="toggle-label">Enable prompted query</span>
+                <input type="checkbox" id="enable-prompted-query" class="toggle-input">
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Selected Tables</div>
+            <div id="selected-tables-list" class="selected-tables-list">
+                <div class="selected-tables-empty">Enable prompted query to select tables.</div>
+            </div>
+        </div>
     </aside>
 
     <main class="main-content">
@@ -830,9 +1069,18 @@
                 </button>
             </div>
         </div>
-        <div class="title-to-query">
-            <input type="text" id="query-title" class="title-to-query-input" placeholder="Type title, e.g. Active users this month">
-            <button class="btn btn-generate" id="btn-generate-query" type="button">Generate Query</button>
+        <div class="title-to-query-section" id="title-to-query-section">
+            <div class="table-selector-wrapper">
+                <label class="table-selector-label">Select Tables</label>
+                <input type="text" id="table-selector-search" class="table-selector-search" placeholder="Search tables...">
+                <div class="table-selector-list" id="table-selector-list">
+                    <div class="table-selector-loading">Loading tables...</div>
+                </div>
+            </div>
+            <div class="title-to-query">
+                <input type="text" id="query-title" class="title-to-query-input" placeholder="Type title, e.g. Active users this month">
+                <button class="btn btn-generate" id="btn-generate-query" type="button">Generate Query</button>
+            </div>
         </div>
         <textarea id="sql-editor"></textarea>
         <div class="keyboard-hint">
@@ -894,7 +1142,7 @@
             <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/>
             <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/>
         </svg>
-        <p>Write an SQL query above and click <strong>Run Query</strong> to see results.</p>
+        <p>Writes an SQL query above and click <strong>Run Query</strong> to see results.</p>
     </div>
 
     </main>
@@ -922,6 +1170,10 @@
     let selectedSavedQueryId = null;
     let editorTheme = 'dracula';
     let activeBackendCalls = 0;
+    let availableTables = [];
+    let selectedTables = [];
+    let tableSearchQuery = '';
+    let isPromptedQueryEnabled = false;
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const savedQueriesIndexUrl = "{{ route('sql-analyzer.saved-queries.index') }}";
@@ -955,6 +1207,11 @@
     const paginationCtrl = document.getElementById('pagination-controls');
     const pageSizeSelect = document.getElementById('page-size');
     const emptyState    = document.getElementById('empty-state');
+    const tableSelectorList = document.getElementById('table-selector-list');
+    const tableSelectorSearch = document.getElementById('table-selector-search');
+    const titleToQuerySection = document.getElementById('title-to-query-section');
+    const enablePromptedQueryToggle = document.getElementById('enable-prompted-query');
+    const selectedTablesList = document.getElementById('selected-tables-list');
 
     function getInitialTheme() {
         const storedTheme = localStorage.getItem('sql-analyzer-theme');
@@ -1198,9 +1455,137 @@
 
     loadSchemaHints();
 
+    async function loadAvailableTables() {
+        try {
+            const data = await withBackendLoading(async () => {
+                const response = await fetch("{{ route('sql-analyzer.tables') }}", {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Unable to load tables.');
+                }
+
+                return await response.json();
+            });
+
+            if (data.data && Array.isArray(data.data.tables)) {
+                availableTables = data.data.tables;
+                renderTableSelector();
+            }
+        } catch (error) {
+            if (tableSelectorList) {
+                tableSelectorList.innerHTML = '<div class="table-selector-empty">Unable to load tables</div>';
+            }
+        }
+    }
+
+    function renderTableSelector() {
+        if (!tableSelectorList) return;
+
+        if (availableTables.length === 0) {
+            tableSelectorList.innerHTML = '<div class="table-selector-empty">No tables available</div>';
+            return;
+        }
+
+        // Filter tables based on search query
+        const filteredTables = availableTables.filter((table) =>
+            table.toLowerCase().includes(tableSearchQuery.toLowerCase())
+        );
+
+        if (filteredTables.length === 0) {
+            tableSelectorList.innerHTML = '<div class="table-selector-empty">No tables match your search</div>';
+            return;
+        }
+
+        tableSelectorList.innerHTML = filteredTables.map((table) => `
+            <label class="table-selector-item ${ selectedTables.includes(table) ? 'selected' : '' }">
+                <input type="checkbox" class="table-checkbox" value="${escapeAttr(table)}" ${ selectedTables.includes(table) ? 'checked' : '' }>
+                <span>${escapeHtml(table)}</span>
+            </label>
+        `).join('');
+
+        document.querySelectorAll('.table-checkbox').forEach((checkbox) => {
+            checkbox.addEventListener('change', function () {
+                const table = this.value;
+                if (this.checked) {
+                    if (!selectedTables.includes(table)) {
+                        selectedTables.push(table);
+                    }
+                } else {
+                    selectedTables = selectedTables.filter((t) => t !== table);
+                }
+                renderTableSelector();
+            });
+        });
+
+        renderSelectedTablesSidebar();
+    }
+
+    loadAvailableTables();
+
+    function renderSelectedTablesSidebar() {
+        if (!selectedTablesList) return;
+
+        if (!isPromptedQueryEnabled) {
+            selectedTablesList.innerHTML = '<div class="selected-tables-empty">Enable prompted query to select tables.</div>';
+            return;
+        }
+
+        if (selectedTables.length === 0) {
+            selectedTablesList.innerHTML = '<div class="selected-tables-empty">No tables selected.</div>';
+            return;
+        }
+
+        selectedTablesList.innerHTML = selectedTables.map((table) =>
+            `<span class="selected-table-chip">${escapeHtml(table)}</span>`
+        ).join('');
+    }
+
+    function setPromptedQueryEnabled(enabled) {
+        isPromptedQueryEnabled = enabled;
+
+        if (titleToQuerySection) {
+            titleToQuerySection.style.display = enabled ? 'block' : 'none';
+        }
+
+        if (enablePromptedQueryToggle) {
+            enablePromptedQueryToggle.checked = enabled;
+        }
+
+        localStorage.setItem('sql-analyzer-prompted-query', enabled ? 'true' : 'false');
+        renderSelectedTablesSidebar();
+    }
+
+    if (enablePromptedQueryToggle) {
+        enablePromptedQueryToggle.addEventListener('change', function () {
+            setPromptedQueryEnabled(this.checked);
+        });
+    }
+
+    const storedPromptedQuery = localStorage.getItem('sql-analyzer-prompted-query');
+    setPromptedQueryEnabled(storedPromptedQuery === 'true');
+
+    // Add search functionality to table selector
+    if (tableSelectorSearch) {
+        tableSelectorSearch.addEventListener('input', function () {
+            tableSearchQuery = this.value;
+            renderTableSelector();
+        });
+    }
+
     async function generateQueryFromTitle() {
+        if (!isPromptedQueryEnabled) return;
         const title = queryTitleInput.value.trim();
         if (!title) return;
+
+        const payload = {
+            title: title
+        };
+
+        if (selectedTables.length > 0) {
+            payload.selected_tables = selectedTables;
+        }
 
         const { ok, body } = await withBackendLoading(async () => {
             const response = await fetch("{{ route('sql-analyzer.generate-query') }}", {
@@ -1210,7 +1595,7 @@
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ title })
+                body: JSON.stringify(payload)
             });
 
             const body = await response.json();

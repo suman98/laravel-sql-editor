@@ -2,12 +2,22 @@
 
 namespace SqlAnalyzer;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class SqlAnalyzerServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        $rootUrl = config('sql-analyzer.root_url');
+        if (!empty($rootUrl)) {
+            URL::forceRootUrl($rootUrl);
+            $scheme = parse_url($rootUrl, PHP_URL_SCHEME);
+            if (!empty($scheme)) {
+                URL::forceScheme($scheme);
+            }
+        }
+
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'sql-analyzer');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');

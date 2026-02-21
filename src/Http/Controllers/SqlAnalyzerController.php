@@ -118,20 +118,13 @@ class SqlAnalyzerController extends Controller
     }
 
     /**
-     * Generate SQL query from natural language title using LangChain AI.
+     * Get list of all available tables in the database.
+     * Used to populate multi-select dropdown for table selection.
      */
-    public function generateQueryFromTitle(Request $request): JsonResponse
+    public function getAvailableTables(): JsonResponse
     {
-        $request->validate([
-            'title' => 'required|string|max:1000',
-        ]);
-
         try {
-            $title = $request->input('title');
-            
             // Resolve package path (not app path)
-            // __FILE__ = src/Http/Controllers/SqlAnalyzerController.php
-            // dirname(__FILE__, 3) = package root
             $packageRoot = dirname(__FILE__, levels: 4);
             $pythonScriptPath = $packageRoot . '/python/get_sql_response.py';
 
@@ -142,17 +135,95 @@ class SqlAnalyzerController extends Controller
             }
 
             $pythonExecutable = PythonEnvironment::getPythonExecutable();
+            $processEnv = $this->buildPythonEnv();
         
             $payload = json_encode([
-                'user_question' => $title,
-                'prompt_template' => null,
+                'action' => 'get_tables',
             ]);
 
-            $process = new Process([
-                $pythonExecutable,
-                $pythonScriptPath,
-                $payload,
+            $process = new Process(
+                [$pythonExecutable, $pythonScriptPath, $payload],
+                null,
+                $processEnv
+            );
+
+            $process->setTimeout(15);
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            $output = trim($process->getOutput());
+            $result = json_decode($output, true);
+
+            if (!$result['success']) {
+                return response()->json([
+                    'error' => $result['error'] ?? 'Failed to retrieve tables',
+                ], 422);
+            }
+
+            return response()->json([
+                'data' => [
+                    'tables' => $result['tables'],
+                    'count' => $result['count'],
+                ],
             ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Failed to retrieve tables: ' . $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Generate SQL query from natural language title using LangChain AI.
+     * Supports optional table selection for restricted queries.
+     */
+    public function generateQueryFromTitle(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:1000',
+            'selected_tables' => 'nullable|array',
+            'selected_tables.*' => 'string',
+        ]);
+
+        try {
+            $title = $request->input('title');
+            $selectedTables = $request->input('selected_tables', null);
+            
+            // Resolve package path (not app path)
+            // __FILE__ = src/Http/Controllers/SqlAnalyzerController.php
+            // dirname(__FILE__, 4) = package root
+            $packageRoot = dirname(__FILE__, levels: 4);
+            $pythonScriptPath = $packageRoot . '/python/get_sql_response.py';
+
+            if (!file_exists($pythonScriptPath)) {
+                return response()->json([
+                    'error' => 'Python script not found.',
+                ], 422);
+            }
+
+            $pythonExecutable = PythonEnvironment::getPythonExecutable();
+            $processEnv = $this->buildPythonEnv();
+        
+            $payload = [
+                'user_question' => $title,
+                'prompt_template' => null,
+            ];
+
+            // Add selected tables to payload if provided
+            if (!empty($selectedTables)) {
+                $payload['selected_tables'] = $selectedTables;
+            }
+
+            $processPayload = json_encode($payload);
+
+            $process = new Process(
+                [$pythonExecutable, $pythonScriptPath, $processPayload],
+                null,
+                $processEnv
+            );
 
             $process->setTimeout(30);
             $process->run();
@@ -173,5 +244,16 @@ class SqlAnalyzerController extends Controller
                 'error' => 'Failed to generate query: ' . $e->getMessage(),
             ], 422);
         }
+    }
+
+    private function buildPythonEnv(): array
+    {
+        $env = [];
+        $openAiApiKey = config('sql-analyzer.openai_api_key');
+        if (!empty($openAiApiKey)) {
+            $env['OPENAI_API_KEY'] = $openAiApiKey;
+        }
+
+        return $env;
     }
 }
