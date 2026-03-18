@@ -2646,15 +2646,19 @@
         }
 
         // Handle database connection change
-        dbConnectionSelect.addEventListener('change', (e) => {
-            selectedDatabaseConnection = e.target.value;
-            localStorage.setItem('sql-analyzer-db-connection', selectedDatabaseConnection);
+        dbConnectionSelect.addEventListener('change', async (e) => {
+            const index = parseInt(e.target.value);
             
-            // Reload tables and schema for the new database
-            loadShowAllTables();
-            
-            // Show notification
-            console.log('Database connection changed to:', selectedDatabaseConnection);
+            if (index >= 0 && savedConnections[index]) {
+                // Use the same logic as useConnection()
+                await useConnection(index);
+            } else {
+                // Clear connection if no valid selection
+                selectedDatabaseConnection = null;
+                localStorage.removeItem('sql-analyzer-active-connection');
+                localStorage.removeItem('sql-analyzer-db-connection');
+                console.log('Connection cleared');
+            }
         });
     }
 
@@ -2754,13 +2758,6 @@
             savedConnections.map((conn, index) => 
                 `<option value="${index}">${escapeHtml(conn.name)}</option>`
             ).join('');
-
-        // Restore previously selected connection
-        const savedIndex = localStorage.getItem('sql-analyzer-active-connection');
-        if (savedIndex && savedConnections[savedIndex]) {
-            dbConnectionSelect.value = savedIndex;
-            selectedDatabaseConnection = JSON.stringify(savedConnections[savedIndex]);
-        }
     }
 
     // Use a saved connection
@@ -2768,16 +2765,18 @@
         const conn = savedConnections[index];
         if (conn) {
             selectedDatabaseConnection = JSON.stringify(conn);
-            localStorage.setItem('sql-analyzer-active-connection', index);
+            localStorage.setItem('sql-analyzer-active-connection', String(index));
             localStorage.setItem('sql-analyzer-db-connection', JSON.stringify(conn));
-            dbConnectionSelect.value = index;
+            if (dbConnectionSelect) {
+                dbConnectionSelect.value = String(index);
+            }
             closeConnectionManager();
             loadShowAllTables();
             
-            // Save active connection to PHP session
+            // Save active connection to PHP session - MUST COMPLETE before any refresh
             try {
                 const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
-                await fetch(`/${dbPrefix}/save-active-connection`, {
+                const response = await fetch(`/${dbPrefix}/save-active-connection`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2786,9 +2785,13 @@
                     credentials: 'same-origin',
                     body: JSON.stringify({ connection: conn })
                 });
-                console.log('Active connection saved to session and localStorage:', conn.name);
+                if (response.ok) {
+                    console.log('Active connection saved to server session:', conn.name);
+                } else {
+                    console.warn('Failed to save connection to server session');
+                }
             } catch (error) {
-                console.log('Could not save to session (local storage fallback active):', error.message);
+                console.log('Could not save to session (local storage is primary):', error.message);
             }
         }
     }
@@ -3464,8 +3467,15 @@
             const conn = typeof selectedDatabaseConnection === 'string' 
                 ? JSON.parse(selectedDatabaseConnection) 
                 : selectedDatabaseConnection;
-            return conn;
+            
+            // Validate that it has required connection fields
+            if (conn && typeof conn === 'object' && conn.name && conn.type) {
+                return conn;
+            }
+            
+            return null;
         } catch (e) {
+            console.error('Invalid connection object:', e);
             return null;
         }
     }
@@ -3497,7 +3507,8 @@
 
                 // Fallback to GET request for default connection
                 const response = await fetch("{{ route('sql-analyzer.schema') }}", {
-                    headers: { 'Accept': 'application/json' }
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
                 });
 
                 if (!response.ok) {
@@ -3522,13 +3533,13 @@
 
     // ── Initialize Active Connection on Page Load ──────────────────
     if (customMode) {
-        // Load saved connections on page load
+        // Load saved connections from localStorage (synchronous)
         loadSavedConnections();
         
         // Restore the previously active connection from server session or localStorage
         (async () => {
             try {
-                // First, try to get active connection from server session
+                // Try to get active connection from server session first
                 const response = await fetch(`/${dbPrefix}/get-active-connection`, {
                     method: 'GET',
                     headers: {
@@ -3542,31 +3553,43 @@
                     const sessionConnection = data.connection;
                     
                     if (sessionConnection && sessionConnection.name) {
-                        // Find the index of this connection in savedConnections
+                        // Find matching connection in savedConnections by name
                         const connIndex = savedConnections.findIndex(c => c.name === sessionConnection.name);
                         if (connIndex !== -1) {
+                            // Restore from server session
                             selectedDatabaseConnection = JSON.stringify(savedConnections[connIndex]);
                             if (dbConnectionSelect) {
-                                dbConnectionSelect.value = connIndex;
+                                dbConnectionSelect.value = String(connIndex);
                             }
-                            localStorage.setItem('sql-analyzer-active-connection', connIndex);
-                            console.log('Restored active connection from server session:', sessionConnection.name);
-                            return; // Successfully restored from session
+                            localStorage.setItem('sql-analyzer-active-connection', String(connIndex));
+                            console.log('✅ Restored active connection from server session:', sessionConnection.name);
+                            
+                            // Reload schema hints and tables for this connection
+                            await loadSchemaHints();
+                            await loadShowAllTables();
+                            return; // Successfully restored
                         }
                     }
                 }
             } catch (error) {
-                console.log('Could not fetch from server session:', error.message);
+                console.log('⚠️ Could not restore from server session:', error.message);
             }
             
-            // Fallback: Restore from localStorage if session fetch failed
+            // Fallback: Restore from localStorage
             const savedActiveIndex = localStorage.getItem('sql-analyzer-active-connection');
-            if (savedActiveIndex !== null && savedConnections[savedActiveIndex]) {
-                selectedDatabaseConnection = JSON.stringify(savedConnections[savedActiveIndex]);
-                if (dbConnectionSelect) {
-                    dbConnectionSelect.value = savedActiveIndex;
+            if (savedActiveIndex !== null) {
+                const index = parseInt(savedActiveIndex);
+                if (index >= 0 && savedConnections[index]) {
+                    selectedDatabaseConnection = JSON.stringify(savedConnections[index]);
+                    if (dbConnectionSelect) {
+                        dbConnectionSelect.value = String(index);
+                    }
+                    console.log('✅ Restored active connection from localStorage:', savedConnections[index].name);
+                    
+                    // Reload schema hints and tables for this connection
+                    await loadSchemaHints();
+                    await loadShowAllTables();
                 }
-                console.log('Restored active connection from localStorage:', savedConnections[savedActiveIndex].name);
             }
         })();
     }
@@ -3581,15 +3604,32 @@
             tablesList.innerHTML = '<div style="text-align: center; color: #64748b; padding: 24px;">Loading tables...</div>';
 
             const data = await withBackendLoading(async () => {
-                let url = "{{ route('sql-analyzer.schema') }}";
                 if (customMode && selectedDatabaseConnection) {
-                    const dbType = getDatabaseTypeForApi();
-                    if (dbType) {
-                        url += '?database=' + encodeURIComponent(dbType);
+                    const connection = getConnectionForApi();
+                    if (connection) {
+                        const response = await fetch("{{ route('sql-analyzer.schema') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            credentials: 'same-origin',
+                            body: JSON.stringify({ connection })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Unable to load tables schema.');
+                        }
+
+                        return await response.json();
                     }
                 }
-                const response = await fetch(url, {
-                    headers: { 'Accept': 'application/json' }
+
+                // Fallback to GET request for default connection
+                const response = await fetch("{{ route('sql-analyzer.schema') }}", {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
                 });
 
                 if (!response.ok) {

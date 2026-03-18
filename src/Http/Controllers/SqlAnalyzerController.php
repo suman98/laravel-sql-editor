@@ -30,7 +30,7 @@ class SqlAnalyzerController extends Controller
      */
     public function execute(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'sql' => 'required|string|max:10000',
             'connection' => 'nullable|array',
             'connection.name' => 'string|max:255',
@@ -40,6 +40,10 @@ class SqlAnalyzerController extends Controller
             'connection.database' => 'nullable|string',
             'connection.username' => 'nullable|string',
             'connection.password' => 'nullable|string',
+        ], [
+            'connection.array' => 'The connection field must be an object with name, type, and other properties.',
+            'connection.name.string' => 'Connection name must be a string.',
+            'connection.type.string' => 'Connection type must be a valid database type (mysql, pgsql, sqlite, sqlsrv, mariadb).',
         ]);
 
         try {
@@ -172,7 +176,7 @@ class SqlAnalyzerController extends Controller
      */
     public function schema(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'database' => 'nullable|string|in:mysql,pgsql,sqlite,sqlsrv,mariadb',
             'connection' => 'nullable|array',
             'connection.name' => 'string|max:255',
@@ -182,6 +186,10 @@ class SqlAnalyzerController extends Controller
             'connection.database' => 'nullable|string',
             'connection.username' => 'nullable|string',
             'connection.password' => 'nullable|string',
+        ], [
+            'connection.array' => 'The connection field must be an object with name, type, and other properties.',
+            'connection.name.string' => 'Connection name must be a string.',
+            'connection.type.string' => 'Connection type must be a valid database type (mysql, pgsql, sqlite, sqlsrv, mariadb).',
         ]);
 
         try {
@@ -298,6 +306,9 @@ class SqlAnalyzerController extends Controller
 
         $connection = $request->input('connection');
         session(['sql-analyzer-active-connection' => $connection]);
+        
+        // Explicitly save session to ensure persistence
+        session()->save();
 
         return response()->json([
             'message' => 'Active connection saved to session',
