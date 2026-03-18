@@ -4,6 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Custom Mode
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, users can dynamically select and configure database
+    | connections through the web interface instead of using a static config.
+    | When disabled, the package uses the configured connection below.
+    |
+    */
+    'custom_mode' => env('SQL_ANALYZER_CUSTOM_MODE', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Root URL
     |--------------------------------------------------------------------------
     |

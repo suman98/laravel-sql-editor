@@ -32,10 +32,12 @@ class SqlAnalyzerController extends Controller
     {
         $request->validate([
             'sql' => 'required|string|max:10000',
+            'database' => 'nullable|string|in:mysql,pgsql,sqlite,sqlsrv,mariadb',
         ]);
 
         try {
-            $result = $this->executor->execute($request->input('sql'));
+            $executor = $this->getExecutorForDatabase($request->input('database'));
+            $result = $executor->execute($request->input('sql'));
 
             return response()->json($result);
         } catch (\Throwable $e) {
@@ -48,15 +50,25 @@ class SqlAnalyzerController extends Controller
     /**
      * Return schema metadata for autocomplete (tables and their columns).
      */
-    public function schema(): JsonResponse
+    public function schema(Request $request): JsonResponse
     {
+        $database = $request->query('database');
+
+        // Validate database parameter if provided
+        if ($database && !in_array($database, ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'mariadb'])) {
+            return response()->json([
+                'error' => 'Invalid database connection specified.',
+            ], 422);
+        }
+
         try {
-            $tables = $this->executor->getTables();
+            $executor = $this->getExecutorForDatabase($database);
+            $tables = $executor->getTables();
             $schema = [];
             $autocompleteSchema = [];
 
             foreach ($tables as $table) {
-                $columns = $this->executor->getColumns($table);
+                $columns = $executor->getColumns($table);
                 $schema[$table] = $columns;
                 
                 // For autocomplete, we need just column names
@@ -139,8 +151,17 @@ class SqlAnalyzerController extends Controller
      * Get list of all available tables in the database.
      * Used to populate multi-select dropdown for table selection.
      */
-    public function getAvailableTables(): JsonResponse
+    public function getAvailableTables(Request $request): JsonResponse
     {
+        $database = $request->query('database');
+
+        // Validate database parameter if provided
+        if ($database && !in_array($database, ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'mariadb'])) {
+            return response()->json([
+                'error' => 'Invalid database connection specified.',
+            ], 422);
+        }
+
         try {
             // Resolve package path (not app path)
             $packageRoot = dirname(__FILE__, levels: 4);
@@ -153,7 +174,7 @@ class SqlAnalyzerController extends Controller
             }
 
             $pythonExecutable = PythonEnvironment::getPythonExecutable();
-            $processEnv = $this->buildPythonEnv();
+            $processEnv = $this->buildPythonEnv($database);
         
             $payload = json_encode([
                 'action' => 'get_tables',
@@ -264,7 +285,24 @@ class SqlAnalyzerController extends Controller
         }
     }
 
-    private function buildPythonEnv(): array
+    private function getExecutorForDatabase(?string $database = null): QueryExecutor
+    {
+        if ($database && config('sql-analyzer.custom_mode')) {
+            // Create a new executor with the specified database connection
+            return new QueryExecutor(
+                $database,
+                config('sql-analyzer.max_rows', 1000),
+                config('sql-analyzer.allowed_statements', ['select']),
+                config('sql-analyzer.only_retrive_data_command', config('sql-analyzer.only_retrieve_data_command', true)),
+                config('sql-analyzer.retrieve_data_commands', ['select', 'show', 'describe', 'desc', 'with', 'explain'])
+            );
+        }
+
+        // Use the default injected executor
+        return $this->executor;
+    }
+
+    private function buildPythonEnv(?string $database = null): array
     {
         $env = [];
         $openAiApiKey = config('sql-analyzer.openai_api_key');
@@ -272,6 +310,12 @@ class SqlAnalyzerController extends Controller
             $env['OPENAI_API_KEY'] = $openAiApiKey;
         }
 
+        // If a database is specified and custom_mode is enabled, pass it to Python
+        if ($database && config('sql-analyzer.custom_mode')) {
+            $env['SQL_DATABASE_CONNECTION'] = $database;
+        }
+
         return $env;
     }
+
 }

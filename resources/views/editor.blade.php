@@ -63,6 +63,59 @@
             gap: 8px;
         }
 
+        .db-connection-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+            border-right: 1px solid #334155;
+            margin-right: 8px;
+        }
+
+        .db-connection-selector label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .db-connection-input {
+            padding: 6px 10px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-size: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            min-width: 140px;
+        }
+
+        .db-connection-input:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .db-connection-input:hover {
+            border-color: #475569;
+        }
+
+        [data-theme="light"] .db-connection-selector {
+            border-right-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .db-connection-input {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #1e293b;
+        }
+
+        [data-theme="light"] .db-connection-input:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -1498,6 +1551,439 @@
             font-style: italic;
         }
 
+        /* Connection Manager Styles */
+        .db-connection-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-manage-connections {
+            background: #6366f1;
+            color: #ffffff;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-manage-connections:hover {
+            background: #4f46e5;
+        }
+
+        .btn-manage-connections svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideInUp 0.3s ease;
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+            background: #1e293b;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .modal-close svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Connection Tabs */
+        .conn-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #334155;
+            margin-bottom: 20px;
+        }
+
+        .conn-tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .conn-tab-btn:hover {
+            color: #e2e8f0;
+        }
+
+        .conn-tab-btn.active {
+            color: #38bdf8;
+            border-bottom-color: #0284c7;
+        }
+
+        .conn-tab-content {
+            display: none;
+        }
+
+        .conn-tab-content.active {
+            display: block;
+        }
+
+        /* Saved Connections List */
+        .saved-connections-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .connection-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .connection-item:hover {
+            border-color: #475569;
+            background: #1e293b;
+        }
+
+        .connection-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .connection-item-name {
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .connection-item-details {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .connection-item-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .btn-connection-action {
+            background: transparent;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-connection-action:hover {
+            background: #334155;
+            border-color: #475569;
+        }
+
+        .btn-connection-delete {
+            color: #f1576c;
+            border-color: #f1576c33;
+        }
+
+        .btn-connection-delete:hover {
+            background: #f1576c22;
+            border-color: #f1576c;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Connection Form */
+        .connection-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+
+        .form-input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        .form-input:disabled {
+            background: #1e293b;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .form-error {
+            font-size: 12px;
+            color: #f1576c;
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .form-group.error .form-input {
+            border-color: #f1576c;
+        }
+
+        .form-group.hidden {
+            display: none;
+        }
+
+        .btn-create-connection {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        [data-theme="light"] .modal-content {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .modal-header {
+            background: #f8fafc;
+            border-bottom-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .modal-header h2 {
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .modal-close {
+            color: #64748b;
+        }
+
+        [data-theme="light"] .modal-close:hover {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        [data-theme="light"] .conn-tabs {
+            border-bottom-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .conn-tab-btn {
+            color: #64748b;
+        }
+
+        [data-theme="light"] .conn-tab-btn:hover {
+            color: #334155;
+        }
+
+        [data-theme="light"] .conn-tab-btn.active {
+            color: #0284c7;
+            border-bottom-color: #0284c7;
+        }
+
+        [data-theme="light"] .connection-item {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+
+        [data-theme="light"] .connection-item:hover {
+            background: #eef2ff;
+            border-color: #cbd5e1;
+        }
+
+        [data-theme="light"] .connection-item-name {
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .connection-item-details {
+            color: #94a3b8;
+        }
+
+        [data-theme="light"] .btn-connection-action {
+            background: transparent;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+
+        [data-theme="light"] .btn-connection-action:hover {
+            background: #eef2ff;
+            border-color: #cbd5e1;
+        }
+
+        [data-theme="light"] .form-input {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        [data-theme="light"] .form-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        [data-theme="light"] .form-group label {
+            color: #334155;
+        }
+
+        [data-theme="light"] .btn-manage-connections {
+            background: #6366f1;
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .btn-manage-connections:hover {
+            background: #4f46e5;
+        }
+
+        @media (max-width: 640px) {
+            .modal-content {
+                width: 95%;
+                max-width: none;
+                max-height: 90vh;
+                border-radius: 10px;
+            }
+
+            .modal-header {
+                padding: 16px;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+
+            .connection-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .connection-item-actions {
+                width: 100%;
+            }
+
+            .btn-connection-action {
+                flex: 1;
+            }
+
+            .db-connection-group {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .db-connection-selector {
+                flex: 1;
+                min-width: 180px;
+            }
+        }
+
         @media (max-width: 1024px) {
             .workspace-grid {
                 grid-template-columns: 1fr;
@@ -1525,6 +2011,22 @@
         SQL Analyzer
     </h1>
     <div class="header-actions">
+        @if(config('sql-analyzer.custom_mode'))
+            <div class="db-connection-group">
+                <div class="db-connection-selector">
+                    <label for="db-connection-select">Active Connection:</label>
+                    <select id="db-connection-select" class="db-connection-input">
+                        <option value="">Select a connection...</option>
+                    </select>
+                </div>
+                <button class="btn btn-manage-connections" id="btn-manage-connections" title="Manage database connections">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+                    </svg>
+                    Manage
+                </button>
+            </div>
+        @endif
         <button class="btn theme-toggle" id="btn-theme" title="Toggle application theme">Light Mode</button>
     </div>
 </header>
@@ -1689,6 +2191,142 @@
 
 </div>
 
+{{-- Connection Manager Modal --}}
+<div id="connection-manager-modal" class="modal hidden" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Manage Database Connections</h2>
+            <button class="modal-close" id="btn-close-connection-manager" title="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            {{-- Tabs for Connection Forms --}}
+            <div class="conn-tabs">
+                <button class="conn-tab-btn active" data-tab="list">Saved Connections</button>
+                <button class="conn-tab-btn" data-tab="create">Create New Connection</button>
+            </div>
+
+            {{-- Saved Connections Tab --}}
+            <div class="conn-tab-content active" id="conn-list-tab">
+                <div id="saved-connections-list" class="saved-connections-list">
+                    <div class="empty-message">No connections saved yet</div>
+                </div>
+            </div>
+
+            {{-- Create Connection Form Tab --}}
+            <div class="conn-tab-content" id="conn-create-tab">
+                <form id="connection-form" class="connection-form">
+                    <div class="form-group">
+                        <label for="conn-name">Connection Name *</label>
+                        <input 
+                            type="text" 
+                            id="conn-name" 
+                            name="name" 
+                            class="form-input"
+                            placeholder="e.g., Production Database, Local Dev"
+                            required
+                        >
+                        <span class="form-error" id="conn-name-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="conn-type">Database Type *</label>
+                        <select id="conn-type" name="type" class="form-input" required>
+                            <option value="">Select a database type</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="pgsql">PostgreSQL</option>
+                            <option value="sqlite">SQLite</option>
+                            <option value="sqlsrv">SQL Server</option>
+                            <option value="mariadb">MariaDB</option>
+                        </select>
+                        <span class="form-error" id="conn-type-error"></span>
+                    </div>
+
+                    <div id="sqlite-fields" class="form-group hidden">
+                        <label for="conn-database">Database File Path *</label>
+                        <input 
+                            type="text" 
+                            id="conn-database" 
+                            name="database" 
+                            class="form-input"
+                            placeholder="e.g., /path/to/database.sqlite"
+                        >
+                        <span class="form-error" id="conn-database-error"></span>
+                    </div>
+
+                    <div id="other-fields">
+                        <div class="form-group">
+                            <label for="conn-host">Host</label>
+                            <input 
+                                type="text" 
+                                id="conn-host" 
+                                name="host" 
+                                class="form-input"
+                                placeholder="localhost"
+                            >
+                            <span class="form-error" id="conn-host-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conn-port">Port</label>
+                            <input 
+                                type="number" 
+                                id="conn-port" 
+                                name="port" 
+                                class="form-input"
+                                placeholder="3306"
+                            >
+                            <span class="form-error" id="conn-port-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conn-database-name">Database Name</label>
+                            <input 
+                                type="text" 
+                                id="conn-database-name" 
+                                name="database_name" 
+                                class="form-input"
+                                placeholder="database"
+                            >
+                            <span class="form-error" id="conn-database-name-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conn-username">Username</label>
+                            <input 
+                                type="text" 
+                                id="conn-username" 
+                                name="username" 
+                                class="form-input"
+                                placeholder="root"
+                            >
+                            <span class="form-error" id="conn-username-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conn-password">Password</label>
+                            <input 
+                                type="password" 
+                                id="conn-password" 
+                                name="password" 
+                                class="form-input"
+                                placeholder="••••••••"
+                            >
+                            <span class="form-error" id="conn-password-error"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-create-connection">Create Connection</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- CodeMirror 5 + SQL mode + hint addon --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
@@ -1714,6 +2352,8 @@
     let isPromptedQueryEnabled = false;
     let activeBackendCalls = 0;
     let tablesSearchQuery = '';
+    let customMode = {{ config('sql-analyzer.custom_mode') ? 'true' : 'false' }};
+    let selectedDatabaseConnection = null;
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const savedQueriesIndexUrl = "{{ route('sql-analyzer.saved-queries.index') }}";
@@ -1757,6 +2397,296 @@
     const tablesSearchInput = document.getElementById('tables-search');
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
+    const dbConnectionSelect = document.getElementById('db-connection-select');
+
+    // ── Database Connection Selection ──────────────────────────────
+    if (customMode && dbConnectionSelect) {
+        // Load previously selected connection from localStorage
+        const savedConnection = localStorage.getItem('sql-analyzer-db-connection');
+        if (savedConnection) {
+            dbConnectionSelect.value = savedConnection;
+            selectedDatabaseConnection = savedConnection;
+        }
+
+        // Handle database connection change
+        dbConnectionSelect.addEventListener('change', (e) => {
+            selectedDatabaseConnection = e.target.value;
+            localStorage.setItem('sql-analyzer-db-connection', selectedDatabaseConnection);
+            
+            // Reload tables and schema for the new database
+            loadShowAllTables();
+            
+            // Show notification
+            console.log('Database connection changed to:', selectedDatabaseConnection);
+        });
+    }
+
+    // ── Connection Manager ──────────────────────────────────────────
+    let savedConnections = [];
+    const connectionManagerModal = document.getElementById('connection-manager-modal');
+    const btnManageConnections = document.getElementById('btn-manage-connections');
+    const btnCloseModal = document.getElementById('btn-close-connection-manager');
+    const connectionForm = document.getElementById('connection-form');
+    const connTabBtns = document.querySelectorAll('.conn-tab-btn');
+    const connTabContents = document.querySelectorAll('.conn-tab-content');
+    const connTypeSelect = document.getElementById('conn-type');
+    const sqliteFields = document.getElementById('sqlite-fields');
+    const otherFields = document.getElementById('other-fields');
+    const savedConnectionsList = document.getElementById('saved-connections-list');
+
+    // Load connections from localStorage
+    function loadSavedConnections() {
+        try {
+            const stored = localStorage.getItem('sql-analyzer-connections');
+            savedConnections = stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            console.error('Failed to load saved connections:', e);
+            savedConnections = [];
+        }
+        updateConnectionsList();
+        updateConnectionDropdown();
+    }
+
+    // Save connections to localStorage
+    function saveSavedConnections() {
+        try {
+            localStorage.setItem('sql-analyzer-connections', JSON.stringify(savedConnections));
+        } catch (e) {
+            console.error('Failed to save connections:', e);
+        }
+    }
+
+    // Update the connections list UI
+    function updateConnectionsList() {
+        if (savedConnections.length === 0) {
+            savedConnectionsList.innerHTML = '<div class="empty-message">No connections saved yet</div>';
+            return;
+        }
+
+        savedConnectionsList.innerHTML = savedConnections.map((conn, index) => `
+            <div class="connection-item">
+                <div class="connection-item-info">
+                    <div class="connection-item-name">${escapeHtml(conn.name)}</div>
+                    <div class="connection-item-details">
+                        Type: ${conn.type} ${conn.host ? `• Host: ${conn.host}` : ''} ${conn.port ? `• Port: ${conn.port}` : ''}
+                    </div>
+                </div>
+                <div class="connection-item-actions">
+                    <button type="button" class="btn-connection-action btn-use-connection" data-index="${index}">Use</button>
+                    <button type="button" class="btn-connection-action btn-connection-delete" data-index="${index}">Delete</button>
+                </div>
+            </div>
+        `).join('');
+
+        // Attach event listeners
+        document.querySelectorAll('.btn-use-connection').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                useConnection(index);
+            });
+        });
+
+        document.querySelectorAll('.btn-connection-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                deleteConnection(index);
+            });
+        });
+    }
+
+    // Update the dropdown with saved connections
+    function updateConnectionDropdown() {
+        dbConnectionSelect.innerHTML = '<option value="">Select a connection...</option>' +
+            savedConnections.map((conn, index) => 
+                `<option value="${index}">${escapeHtml(conn.name)}</option>`
+            ).join('');
+
+        // Restore previously selected connection
+        const savedIndex = localStorage.getItem('sql-analyzer-active-connection');
+        if (savedIndex && savedConnections[savedIndex]) {
+            dbConnectionSelect.value = savedIndex;
+            selectedDatabaseConnection = JSON.stringify(savedConnections[savedIndex]);
+        }
+    }
+
+    // Use a saved connection
+    function useConnection(index) {
+        const conn = savedConnections[index];
+        if (conn) {
+            selectedDatabaseConnection = JSON.stringify(conn);
+            localStorage.setItem('sql-analyzer-active-connection', index);
+            localStorage.setItem('sql-analyzer-db-connection', JSON.stringify(conn));
+            dbConnectionSelect.value = index;
+            closeConnectionManager();
+            loadShowAllTables();
+            console.log('Using connection:', conn.name);
+        }
+    }
+
+    // Delete a saved connection
+    function deleteConnection(index) {
+        if (confirm('Are you sure you want to delete this connection?')) {
+            savedConnections.splice(index, 1);
+            saveSavedConnections();
+            updateConnectionsList();
+            updateConnectionDropdown();
+            console.log('Connection deleted');
+        }
+    }
+
+    // Modal management
+    function openConnectionManager() {
+        connectionManagerModal.style.display = 'flex';
+        connectionManagerModal.classList.remove('hidden');
+        loadSavedConnections();
+    }
+
+    function closeConnectionManager() {
+        connectionManagerModal.style.display = 'none';
+        connectionManagerModal.classList.add('hidden');
+    }
+
+    // Modal events
+    if (btnManageConnections) {
+        btnManageConnections.addEventListener('click', openConnectionManager);
+    }
+
+    if (btnCloseModal) {
+        btnCloseModal.addEventListener('click', closeConnectionManager);
+    }
+
+    connectionManagerModal?.addEventListener('click', (e) => {
+        if (e.target === connectionManagerModal) {
+            closeConnectionManager();
+        }
+    });
+
+    // Connection tab switching
+    connTabBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            connTabBtns.forEach(b => b.classList.remove('active'));
+            connTabContents.forEach(c => c.classList.remove('active'));
+            e.target.classList.add('active');
+            const tabName = e.target.dataset.tab;
+            document.getElementById(`conn-${tabName}-tab`)?.classList.add('active');
+
+            // Reset form when switching to create tab
+            if (tabName === 'create') {
+                connectionForm.reset();
+                updateConnectionFormFields();
+            }
+        });
+    });
+
+    // Database type selection handling
+    function updateConnectionFormFields() {
+        const type = connTypeSelect.value;
+        if (type === 'sqlite') {
+            sqliteFields.classList.remove('hidden');
+            otherFields.classList.add('hidden');
+        } else {
+            sqliteFields.classList.add('hidden');
+            otherFields.classList.remove('hidden');
+        }
+    }
+
+    if (connTypeSelect) {
+        connTypeSelect.addEventListener('change', updateConnectionFormFields);
+    }
+
+    // Connection form submission
+    if (connectionForm) {
+        connectionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Clear previous errors
+            document.querySelectorAll('.form-error').forEach(el => {
+                el.textContent = '';
+                el.classList.remove('show');
+                el.parentElement?.classList.remove('error');
+            });
+
+            const formData = new FormData(connectionForm);
+            const connName = formData.get('name')?.trim();
+            const connType = formData.get('type');
+
+            let errors = {};
+
+            // Validation
+            if (!connName) {
+                errors.name = 'Connection name is required';
+            } else if (savedConnections.some(c => c.name === connName)) {
+                errors.name = 'A connection with this name already exists';
+            }
+
+            if (!connType) {
+                errors.type = 'Database type is required';
+            }
+
+            if (connType === 'sqlite') {
+                const dbPath = formData.get('database')?.trim();
+                if (!dbPath) {
+                    errors.database = 'Database file path is required for SQLite';
+                }
+            } else {
+                const host = formData.get('host')?.trim();
+                if (host && host.length > 255) {
+                    errors.host = 'Host must be less than 255 characters';
+                }
+                const port = formData.get('port');
+                if (port && (isNaN(port) || port < 1 || port > 65535)) {
+                    errors.port = 'Port must be between 1 and 65535';
+                }
+            }
+
+            // Show errors
+            if (Object.keys(errors).length > 0) {
+                Object.entries(errors).forEach(([field, message]) => {
+                    const errorEl = document.getElementById(`conn-${field}-error`);
+                    if (errorEl) {
+                        errorEl.textContent = message;
+                        errorEl.classList.add('show');
+                        errorEl.parentElement?.classList.add('error');
+                    }
+                });
+                return;
+            }
+
+            // Create connection object
+            const newConnection = {
+                name: connName,
+                type: connType,
+            };
+
+            if (connType === 'sqlite') {
+                newConnection.database = formData.get('database')?.trim();
+            } else {
+                newConnection.host = formData.get('host')?.trim() || 'localhost';
+                newConnection.port = formData.get('port') ? parseInt(formData.get('port')) : null;
+                newConnection.database = formData.get('database_name')?.trim();
+                newConnection.username = formData.get('username')?.trim();
+                newConnection.password = formData.get('password') || '';
+            }
+
+            // Add to saved connections
+            savedConnections.push(newConnection);
+            saveSavedConnections();
+            updateConnectionsList();
+            updateConnectionDropdown();
+            connectionForm.reset();
+            updateConnectionFormFields();
+
+            // Switch to list tab
+            connTabBtns[0].click();
+
+            console.log('New connection created:', newConnection.name);
+        });
+    }
+
+    // Initialize connections on page load
+    if (customMode && dbConnectionSelect) {
+        loadSavedConnections();
+    }
 
     // ── Tab navigation ────────────────────────────────────────────
     function switchTab(tabName) {
@@ -2034,10 +2964,29 @@
     });
 
     // ── Load DB schema for autocomplete ────────────────────────────
+    function getDatabaseTypeForApi() {
+        if (!selectedDatabaseConnection) return '';
+        try {
+            const conn = typeof selectedDatabaseConnection === 'string' 
+                ? JSON.parse(selectedDatabaseConnection) 
+                : selectedDatabaseConnection;
+            return conn.type || '';
+        } catch (e) {
+            return '';
+        }
+    }
+
     async function loadSchemaHints() {
         try {
             const data = await withBackendLoading(async () => {
-                const response = await fetch("{{ route('sql-analyzer.schema') }}", {
+                let url = "{{ route('sql-analyzer.schema') }}";
+                if (customMode && selectedDatabaseConnection) {
+                    const dbType = getDatabaseTypeForApi();
+                    if (dbType) {
+                        url += '?database=' + encodeURIComponent(dbType);
+                    }
+                }
+                const response = await fetch(url, {
                     headers: { 'Accept': 'application/json' }
                 });
 
@@ -2071,7 +3020,14 @@
             tablesList.innerHTML = '<div style="text-align: center; color: #64748b; padding: 24px;">Loading tables...</div>';
 
             const data = await withBackendLoading(async () => {
-                const response = await fetch("{{ route('sql-analyzer.schema') }}", {
+                let url = "{{ route('sql-analyzer.schema') }}";
+                if (customMode && selectedDatabaseConnection) {
+                    const dbType = getDatabaseTypeForApi();
+                    if (dbType) {
+                        url += '?database=' + encodeURIComponent(dbType);
+                    }
+                }
+                const response = await fetch(url, {
                     headers: { 'Accept': 'application/json' }
                 });
 
@@ -2223,6 +3179,14 @@
         try {
             startBackendLoading();
             
+            const requestBody = { sql };
+            if (customMode && selectedDatabaseConnection) {
+                const dbType = getDatabaseTypeForApi();
+                if (dbType) {
+                    requestBody.database = dbType;
+                }
+            }
+            
             const response = await fetch("{{ route('sql-analyzer.execute') }}", {
                 method: 'POST',
                 headers: {
@@ -2230,7 +3194,7 @@
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ sql })
+                body: JSON.stringify(requestBody)
             });
 
             const body = await response.json();
@@ -2285,7 +3249,14 @@
     async function loadAvailableTables() {
         try {
             const data = await withBackendLoading(async () => {
-                const response = await fetch("{{ route('sql-analyzer.tables') }}", {
+                let url = "{{ route('sql-analyzer.tables') }}";
+                if (customMode && selectedDatabaseConnection) {
+                    const dbType = getDatabaseTypeForApi();
+                    if (dbType) {
+                        url += '?database=' + encodeURIComponent(dbType);
+                    }
+                }
+                const response = await fetch(url, {
                     headers: { 'Accept': 'application/json' }
                 });
 
@@ -2469,6 +3440,14 @@
 
         try {
             const { ok, body } = await withBackendLoading(async () => {
+                const requestBody = { sql };
+                if (customMode && selectedDatabaseConnection) {
+                    const dbType = getDatabaseTypeForApi();
+                    if (dbType) {
+                        requestBody.database = dbType;
+                    }
+                }
+                
                 const response = await fetch("{{ route('sql-analyzer.execute') }}", {
                     method: 'POST',
                     headers: {
@@ -2476,7 +3455,7 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify({ sql })
+                    body: JSON.stringify(requestBody)
                 });
 
                 const body = await response.json();
