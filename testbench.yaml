@@ -1,0 +1,16 @@
+providers:
+  - SqlAnalyzer\SqlAnalyzerServiceProvider
+
+migrations: true
+
+seeders: false
+
+workbench:
+  start: "/"
+  install: true
+  discovers:
+    web: true
+    api: false
+    commands: false
+    components: false
+  build: []
