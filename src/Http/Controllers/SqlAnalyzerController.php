@@ -32,11 +32,19 @@ class SqlAnalyzerController extends Controller
     {
         $request->validate([
             'sql' => 'required|string|max:10000',
-            'database' => 'nullable|string|in:mysql,pgsql,sqlite,sqlsrv,mariadb',
+            'connection' => 'nullable|array',
+            'connection.name' => 'string|max:255',
+            'connection.type' => 'string|in:mysql,pgsql,sqlite,sqlsrv,mariadb',
+            'connection.host' => 'nullable|string|max:255',
+            'connection.port' => 'nullable|integer|min:1|max:65535',
+            'connection.database' => 'nullable|string',
+            'connection.username' => 'nullable|string',
+            'connection.password' => 'nullable|string',
         ]);
 
         try {
-            $executor = $this->getExecutorForDatabase($request->input('database'));
+            $connection = $request->input('connection');
+            $executor = $this->getExecutorForConnection($connection);
             $result = $executor->execute($request->input('sql'));
 
             return response()->json($result);
@@ -164,21 +172,33 @@ class SqlAnalyzerController extends Controller
      */
     public function schema(Request $request): JsonResponse
     {
-        $database = $request->query('database');
-
-        // Validate database parameter if provided
-        if ($database && !in_array($database, ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'mariadb'])) {
-            return response()->json([
-                'error' => 'Invalid database connection specified.',
-            ], 422);
-        }
+        $request->validate([
+            'database' => 'nullable|string|in:mysql,pgsql,sqlite,sqlsrv,mariadb',
+            'connection' => 'nullable|array',
+            'connection.name' => 'string|max:255',
+            'connection.type' => 'string|in:mysql,pgsql,sqlite,sqlsrv,mariadb',
+            'connection.host' => 'nullable|string|max:255',
+            'connection.port' => 'nullable|integer|min:1|max:65535',
+            'connection.database' => 'nullable|string',
+            'connection.username' => 'nullable|string',
+            'connection.password' => 'nullable|string',
+        ]);
 
         try {
-            $executor = $this->getExecutorForDatabase($database);
+            $connection = $request->input('connection');
+            $database = $request->query('database');
+            
+            // Use connection object if provided, otherwise fall back to database string
+            if ($connection) {
+                $executor = $this->getExecutorForConnection($connection);
+            } else {
+                $executor = $this->getExecutorForDatabase($database);
+            }
+
             $tables = $executor->getTables();
             $schema = [];
             $autocompleteSchema = [];
-
+        
             foreach ($tables as $table) {
                 $columns = $executor->getColumns($table);
                 $schema[$table] = $columns;
@@ -256,6 +276,45 @@ class SqlAnalyzerController extends Controller
 
         return response()->json([
             'message' => 'Query deleted successfully',
+        ]);
+    }
+
+    /**
+     * Save the active connection information to the session.
+     * This persists the user's active connection choice server-side.
+     */
+    public function saveActiveConnection(Request $request): JsonResponse
+    {
+        $request->validate([
+            'connection' => 'required|array',
+            'connection.name' => 'required|string|max:255',
+            'connection.type' => 'required|string|in:mysql,pgsql,sqlite,sqlsrv,mariadb',
+            'connection.host' => 'nullable|string|max:255',
+            'connection.port' => 'nullable|integer|min:1|max:65535',
+            'connection.database' => 'nullable|string',
+            'connection.username' => 'nullable|string',
+            'connection.password' => 'nullable|string',
+        ]);
+
+        $connection = $request->input('connection');
+        session(['sql-analyzer-active-connection' => $connection]);
+
+        return response()->json([
+            'message' => 'Active connection saved to session',
+            'connection' => $connection,
+        ]);
+    }
+
+    /**
+     * Retrieve the active connection information from the session.
+     * Returns the currently active connection if one is set.
+     */
+    public function getActiveConnection(): JsonResponse
+    {
+        $activeConnection = session('sql-analyzer-active-connection');
+
+        return response()->json([
+            'connection' => $activeConnection,
         ]);
     }
 
@@ -412,6 +471,91 @@ class SqlAnalyzerController extends Controller
 
         // Use the default injected executor
         return $this->executor;
+    }
+
+    private function getExecutorForConnection(?array $connection = null): QueryExecutor
+    {
+        if (!$connection || !config('sql-analyzer.custom_mode')) {
+            return $this->executor;
+        }
+
+        // Build database config from connection data
+        $type = $connection['type'] ?? null;
+        
+        if ($type === 'sqlite') {
+            $dbConfig = [
+                'driver' => 'sqlite',
+                'database' => $connection['database'] ?? '',
+                'prefix' => '',
+            ];
+        } else if ($type === 'mysql') {
+            $dbConfig = [
+                'driver' => $type,
+                'host' => $connection['host'] ?? 'localhost',
+                'port' => $connection['port'] ?? 3306,
+                'database' => $connection['database'] ?? '',
+                'username' => $connection['username'] ?? '',
+                'password' => $connection['password'] ?? '',
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'strict' => false,
+                'engine' => 'InnoDB',
+            ];
+        } else if ($type === 'pgsql') {
+            $dbConfig = [
+                'driver' => $type,
+                'host' => $connection['host'] ?? 'localhost',
+                'port' => $connection['port'] ?? 5432,
+                'database' => $connection['database'] ?? '',
+                'username' => $connection['username'] ?? '',
+                'password' => $connection['password'] ?? '',
+                'prefix' => '',
+                'schema' => 'public',
+                'sslmode' => 'prefer',
+            ];
+        } else if ($type === 'sqlsrv') {
+            $dbConfig = [
+                'driver' => $type,
+                'host' => $connection['host'] ?? 'localhost',
+                'port' => $connection['port'] ?? 1433,
+                'database' => $connection['database'] ?? '',
+                'username' => $connection['username'] ?? '',
+                'password' => $connection['password'] ?? '',
+                'prefix' => '',
+                'encrypt' => 'yes',
+                'trust_server_certificate' => false,
+            ];
+        } else if ($type === 'mariadb') {
+            $dbConfig = [
+                'driver' => $type,
+                'host' => $connection['host'] ?? 'localhost',
+                'port' => $connection['port'] ?? 3306,
+                'database' => $connection['database'] ?? '',
+                'username' => $connection['username'] ?? '',
+                'password' => $connection['password'] ?? '',
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'strict' => false,
+                'engine' => 'InnoDB',
+            ];
+        } else {
+            // Unknown type, use default executor
+            return $this->executor;
+        }
+
+        // Register connection in database config
+        config(['database.connections.custom_dynamic' => $dbConfig]);
+
+        // Create executor with the custom connection name
+        return new QueryExecutor(
+            'custom_dynamic',
+            config('sql-analyzer.max_rows', 1000),
+            config('sql-analyzer.allowed_statements', ['select']),
+            config('sql-analyzer.only_retrive_data_command', config('sql-analyzer.only_retrieve_data_command', true)),
+            config('sql-analyzer.retrieve_data_commands', ['select', 'show', 'describe', 'desc', 'with', 'explain'])
+        );
     }
 
     private function buildPythonEnv(?string $database = null): array
