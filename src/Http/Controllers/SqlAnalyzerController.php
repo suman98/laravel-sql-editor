@@ -48,6 +48,118 @@ class SqlAnalyzerController extends Controller
     }
 
     /**
+     * Test a database connection.
+     * @param  Request  $request
+     * @return JsonResponse
+     */
+    public function testConnection(Request $request): JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|string|in:mysql,pgsql,sqlite,sqlsrv,mariadb',
+            'host' => 'nullable|string|max:255',
+            'port' => 'nullable|integer|min:1|max:65535',
+            'database' => 'nullable|string',
+            'username' => 'nullable|string',
+            'password' => 'nullable|string',
+        ]);
+
+        try {
+            $type = $request->input('type');
+            $config = [];
+
+            // Build config based on database type
+            if ($type === 'sqlite') {
+                $config = [
+                    'driver' => 'sqlite',
+                    'database' => $request->input('database'),
+                    'prefix' => '',
+                ];
+            } else if ($type === 'mysql') {
+                $config = [
+                    'driver' => $type,
+                    'host' => $request->input('host', 'localhost'),
+                    'port' => $request->input('port', 3306),
+                    'database' => $request->input('database'),
+                    'username' => $request->input('username'),
+                    'password' => $request->input('password'),
+                    'charset' => 'utf8mb4',
+                    'collation' => 'utf8mb4_unicode_ci',
+                    'prefix' => '',
+                    'strict' => false,
+                    'engine' => 'InnoDB',
+                ];
+            } else if ($type === 'pgsql') {
+                $config = [
+                    'driver' => $type,
+                    'host' => $request->input('host', 'localhost'),
+                    'port' => $request->input('port', 5432),
+                    'database' => $request->input('database'),
+                    'username' => $request->input('username'),
+                    'password' => $request->input('password'),
+                    'prefix' => '',
+                    'schema' => 'public',
+                    'sslmode' => 'prefer',
+                ];
+            } else if ($type === 'sqlsrv') {
+                $config = [
+                    'driver' => $type,
+                    'host' => $request->input('host', 'localhost'),
+                    'port' => $request->input('port', 1433),
+                    'database' => $request->input('database'),
+                    'username' => $request->input('username'),
+                    'password' => $request->input('password'),
+                    'prefix' => '',
+                    'encrypt' => 'yes',
+                    'trust_server_certificate' => false,
+                ];
+            } else if ($type === 'mariadb') {
+                $config = [
+                    'driver' => $type,
+                    'host' => $request->input('host', 'localhost'),
+                    'port' => $request->input('port', 3306),
+                    'database' => $request->input('database'),
+                    'username' => $request->input('username'),
+                    'password' => $request->input('password'),
+                    'charset' => 'utf8mb4',
+                    'collation' => 'utf8mb4_unicode_ci',
+                    'prefix' => '',
+                    'strict' => false,
+                    'engine' => 'InnoDB',
+                ];
+            } else {
+                $config = [
+                    'driver' => $type,
+                    'host' => $request->input('host', 'localhost'),
+                    'port' => $request->input('port'),
+                    'database' => $request->input('database'),
+                    'username' => $request->input('username'),
+                    'password' => $request->input('password'),
+                    'prefix' => '',
+                ];
+            }
+
+            // Test the connection
+            $db = new \Illuminate\Database\Capsule\Manager;
+            $db->addConnection($config, 'test');
+            $db->setAsGlobal();
+
+            $connection = $db->connection('test');
+            $connection->statement('SELECT 1');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Connection successful!',
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
      * Return schema metadata for autocomplete (tables and their columns).
      */
     public function schema(Request $request): JsonResponse

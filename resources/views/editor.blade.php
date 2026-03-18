@@ -1846,9 +1846,133 @@
             display: none;
         }
 
-        .btn-create-connection {
+        .hidden {
+            display: none !important;
+        }
+
+        .btn-create-connection,
+        .btn-save-connection {
             width: 100%;
             margin-top: 8px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+        }
+
+        .btn-connection-action.btn-test,
+        .btn-connection-action.btn-edit {
+            background: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
+        }
+
+        .btn-connection-action.btn-test:hover,
+        .btn-connection-action.btn-edit:hover {
+            background: #0264a8;
+            border-color: #0264a8;
+        }
+
+        .btn-cancel-edit {
+            background: #475569;
+        }
+
+        .btn-cancel-edit:hover {
+            background: #64748b;
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .connection-status.success {
+            background: #064e3b;
+            color: #6ee7b7;
+            border: 1px solid #10b981;
+        }
+
+        .connection-status.error {
+            background: #450a0a;
+            color: #fca5a5;
+            border: 1px solid #7f1d1d;
+        }
+
+        [data-theme="light"] .connection-status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #6ee7b7;
+        }
+
+        [data-theme="light"] .connection-status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        [data-theme="light"] .btn-connection-action.btn-test,
+        [data-theme="light"] .btn-connection-action.btn-edit {
+            background: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .btn-connection-action.btn-test:hover,
+        [data-theme="light"] .btn-connection-action.btn-edit:hover {
+            background: #0264a8;
+            border-color: #0264a8;
+        }
+
+        [data-theme="light"] .btn-cancel-edit {
+            background: #cbd5e1;
+            color: #334155;
+        }
+
+        [data-theme="light"] .btn-cancel-edit:hover {
+            background: #94a3b8;
+        }
+
+        [data-theme="light"] .conn-tab-btn.hidden {
+            display: none;
+        }
+
+        [data-theme="light"] .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        [data-theme="light"] .form-actions .btn {
+            flex: 1;
+        }
+
+        [data-theme="light"] .btn-connection-delete {
+            color: #dc2626;
+            border-color: #dc2626;
+        }
+
+        [data-theme="light"] .btn-connection-delete:hover {
+            background: #dc262622;
+            border-color: #dc2626;
+        }
+
+        [data-theme="light"] .db-manage-connections {
+            background: #6366f1;
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .db-manage-connections:hover {
+            background: #4f46e5;
         }
 
         [data-theme="light"] .modal-content {
@@ -2208,6 +2332,7 @@
             <div class="conn-tabs">
                 <button class="conn-tab-btn active" data-tab="list">Saved Connections</button>
                 <button class="conn-tab-btn" data-tab="create">Create New Connection</button>
+                <button class="conn-tab-btn hidden" id="conn-edit-tab-btn" data-tab="edit">Edit Connection</button>
             </div>
 
             {{-- Saved Connections Tab --}}
@@ -2323,6 +2448,116 @@
                     <button type="submit" class="btn btn-primary btn-create-connection">Create Connection</button>
                 </form>
             </div>
+
+            {{-- Edit Connection Form Tab --}}
+            <div class="conn-tab-content" id="conn-edit-tab">
+                <form id="connection-edit-form" class="connection-form">
+                    <div class="form-group">
+                        <label for="conn-edit-name">Connection Name *</label>
+                        <input 
+                            type="text" 
+                            id="conn-edit-name" 
+                            name="name" 
+                            class="form-input"
+                            placeholder="e.g., Production Database, Local Dev"
+                            required
+                        >
+                        <span class="form-error" id="conn-edit-name-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="conn-edit-type">Database Type *</label>
+                        <select id="conn-edit-type" name="type" class="form-input" required>
+                            <option value="">Select a database type</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="pgsql">PostgreSQL</option>
+                            <option value="sqlite">SQLite</option>
+                            <option value="sqlsrv">SQL Server</option>
+                            <option value="mariadb">MariaDB</option>
+                        </select>
+                        <span class="form-error" id="conn-edit-type-error"></span>
+                    </div>
+
+                    <div id="sqlite-edit-fields" class="form-group hidden">
+                        <label for="conn-edit-database">Database File Path *</label>
+                        <input 
+                            type="text" 
+                            id="conn-edit-database" 
+                            name="database" 
+                            class="form-input"
+                            placeholder="e.g., /path/to/database.sqlite"
+                        >
+                        <span class="form-error" id="conn-edit-database-error"></span>
+                    </div>
+
+                    <div id="other-edit-fields">
+                        <div class="form-group">
+                            <label for="conn-edit-host">Host</label>
+                            <input 
+                                type="text" 
+                                id="conn-edit-host" 
+                                name="host" 
+                                class="form-input"
+                                placeholder="localhost"
+                            >
+                            <span class="form-error" id="conn-edit-host-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conn-edit-port">Port</label>
+                            <input 
+                                type="number" 
+                                id="conn-edit-port" 
+                                name="port" 
+                                class="form-input"
+                                placeholder="3306"
+                            >
+                            <span class="form-error" id="conn-edit-port-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conn-edit-database-name">Database Name</label>
+                            <input 
+                                type="text" 
+                                id="conn-edit-database-name" 
+                                name="database_name" 
+                                class="form-input"
+                                placeholder="database"
+                            >
+                            <span class="form-error" id="conn-edit-database-name-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conn-edit-username">Username</label>
+                            <input 
+                                type="text" 
+                                id="conn-edit-username" 
+                                name="username" 
+                                class="form-input"
+                                placeholder="root"
+                            >
+                            <span class="form-error" id="conn-edit-username-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conn-edit-password">Password</label>
+                            <input 
+                                type="password" 
+                                id="conn-edit-password" 
+                                name="password" 
+                                class="form-input"
+                                placeholder="••••••••"
+                            >
+                            <span class="form-error" id="conn-edit-password-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-save-connection">Save Changes</button>
+                        <button type="button" class="btn btn-clear btn-cancel-edit">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -2355,7 +2590,9 @@
     let customMode = {{ config('sql-analyzer.custom_mode') ? 'true' : 'false' }};
     let selectedDatabaseConnection = null;
 
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+                     document.querySelector('input[name="_token"]')?.value || 
+                     document.querySelector('[name="_token"]')?.content || '';
     const savedQueriesIndexUrl = "{{ route('sql-analyzer.saved-queries.index') }}";
     const savedQueriesStoreUrl = "{{ route('sql-analyzer.saved-queries.store') }}";
     const savedQueriesShowUrlTemplate = "{{ route('sql-analyzer.saved-queries.show', ['id' => '__ID__']) }}";
@@ -2470,15 +2707,32 @@
                     <div class="connection-item-details">
                         Type: ${conn.type} ${conn.host ? `• Host: ${conn.host}` : ''} ${conn.port ? `• Port: ${conn.port}` : ''}
                     </div>
+                    <div id="test-status-${index}"></div>
                 </div>
                 <div class="connection-item-actions">
-                    <button type="button" class="btn-connection-action btn-use-connection" data-index="${index}">Use</button>
-                    <button type="button" class="btn-connection-action btn-connection-delete" data-index="${index}">Delete</button>
+                    <button type="button" class="btn-connection-action btn-test" data-index="${index}" title="Test connection">Test</button>
+                    <button type="button" class="btn-connection-action btn-edit" data-index="${index}" title="Edit connection">Edit</button>
+                    <button type="button" class="btn-connection-action btn-use-connection" data-index="${index}" title="Use this connection">Use</button>
+                    <button type="button" class="btn-connection-action btn-connection-delete" data-index="${index}" title="Delete connection">Delete</button>
                 </div>
             </div>
         `).join('');
 
         // Attach event listeners
+        document.querySelectorAll('.btn-test').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                testConnection(index);
+            });
+        });
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                editConnection(index);
+            });
+        });
+
         document.querySelectorAll('.btn-use-connection').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const index = parseInt(e.target.dataset.index);
@@ -2531,6 +2785,101 @@
             updateConnectionsList();
             updateConnectionDropdown();
             console.log('Connection deleted');
+        }
+    }
+
+    // Test a connection
+    async function testConnection(index) {
+        const conn = savedConnections[index];
+        if (!conn) return;
+
+        const statusEl = document.getElementById(`test-status-${index}`);
+        if (!statusEl) return;
+
+        statusEl.textContent = 'Testing...';
+        statusEl.className = 'connection-status';
+
+        try {
+            // Ensure CSRF token is available
+            if (!csrfToken) {
+                throw new Error('CSRF token not found. Please refresh the page.');
+            }
+
+            const response = await fetch("{{ route('sql-analyzer.test-connection') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                credentials: 'same-origin',  // Ensure cookies are sent
+                body: JSON.stringify(conn)
+            });
+
+            const body = await response.json();
+
+            if (response.ok && body.success) {
+                statusEl.textContent = '✓ Connection successful';
+                statusEl.className = 'connection-status success';
+            } else if (response.status === 419) {
+                statusEl.textContent = '✗ Session expired. Please refresh the page.';
+                statusEl.className = 'connection-status error';
+            } else {
+                statusEl.textContent = '✗ ' + (body.error || body.message || 'Connection failed');
+                statusEl.className = 'connection-status error';
+            }
+
+            // Clear status after 5 seconds
+            setTimeout(() => {
+                statusEl.textContent = '';
+                statusEl.className = '';
+            }, 5000);
+        } catch (error) {
+            statusEl.textContent = '✗ ' + error.message;
+            statusEl.className = 'connection-status error';
+        }
+    }
+
+    // Edit a connection
+    function editConnection(index) {
+        const conn = savedConnections[index];
+        if (!conn) return;
+
+        // Populate edit form
+        document.getElementById('conn-edit-name').value = conn.name || '';
+        document.getElementById('conn-edit-type').value = conn.type || '';
+        document.getElementById('conn-edit-host').value = conn.host || '';
+        document.getElementById('conn-edit-port').value = conn.port || '';
+        document.getElementById('conn-edit-database-name').value = conn.database || '';
+        document.getElementById('conn-edit-database').value = conn.database || '';
+        document.getElementById('conn-edit-username').value = conn.username || '';
+        document.getElementById('conn-edit-password').value = conn.password || '';
+
+        // Update visibility based on type
+        updateEditConnectionFormFields();
+
+        // Show edit tab
+        document.getElementById('conn-edit-tab-btn').classList.remove('hidden');
+        connTabBtns[2].click();
+
+        // Store index for saving
+        connectionEditIndex = index;
+    }
+
+    let connectionEditIndex = null;
+
+    // Update edit form field visibility
+    function updateEditConnectionFormFields() {
+        const type = document.getElementById('conn-edit-type').value;
+        const sqliteFields = document.getElementById('sqlite-edit-fields');
+        const otherFields = document.getElementById('other-edit-fields');
+
+        if (type === 'sqlite') {
+            sqliteFields.classList.remove('hidden');
+            otherFields.classList.add('hidden');
+        } else {
+            sqliteFields.classList.add('hidden');
+            otherFields.classList.remove('hidden');
         }
     }
 
@@ -2592,6 +2941,12 @@
 
     if (connTypeSelect) {
         connTypeSelect.addEventListener('change', updateConnectionFormFields);
+    }
+
+    // Edit form fields visibility
+    const connEditTypeSelect = document.getElementById('conn-edit-type');
+    if (connEditTypeSelect) {
+        connEditTypeSelect.addEventListener('change', updateEditConnectionFormFields);
     }
 
     // Connection form submission
@@ -2681,6 +3036,103 @@
 
             console.log('New connection created:', newConnection.name);
         });
+    }
+
+    // Edit connection form submission
+    const connectionEditForm = document.getElementById('connection-edit-form');
+    if (connectionEditForm) {
+        connectionEditForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Clear previous errors
+            document.querySelectorAll('.form-error').forEach(el => {
+                el.textContent = '';
+                el.classList.remove('show');
+                el.parentElement?.classList.remove('error');
+            });
+
+            const formData = new FormData(connectionEditForm);
+            const connName = formData.get('name')?.trim();
+            const connType = formData.get('type');
+
+            let errors = {};
+
+            // Validation
+            if (!connName) {
+                errors.name = 'Connection name is required';
+            } else if (connectionEditIndex !== null && savedConnections.some((c, i) => i !== connectionEditIndex && c.name === connName)) {
+                errors.name = 'A connection with this name already exists';
+            }
+
+            if (!connType) {
+                errors.type = 'Database type is required';
+            }
+
+            if (connType === 'sqlite') {
+                const dbPath = formData.get('database')?.trim();
+                if (!dbPath) {
+                    errors.database = 'Database file path is required for SQLite';
+                }
+            }
+
+            // Show errors
+            if (Object.keys(errors).length > 0) {
+                Object.entries(errors).forEach(([field, message]) => {
+                    const errorEl = document.getElementById(`conn-edit-${field}-error`);
+                    if (errorEl) {
+                        errorEl.textContent = message;
+                        errorEl.classList.add('show');
+                        errorEl.parentElement?.classList.add('error');
+                    }
+                });
+                return;
+            }
+
+            if (connectionEditIndex === null) return;
+
+            // Update connection object
+            const updatedConnection = {
+                name: connName,
+                type: connType,
+            };
+
+            if (connType === 'sqlite') {
+                updatedConnection.database = formData.get('database')?.trim();
+            } else {
+                updatedConnection.host = formData.get('host')?.trim() || 'localhost';
+                updatedConnection.port = formData.get('port') ? parseInt(formData.get('port')) : null;
+                updatedConnection.database = formData.get('database_name')?.trim();
+                updatedConnection.username = formData.get('username')?.trim();
+                updatedConnection.password = formData.get('password') || '';
+            }
+
+            // Update in array
+            savedConnections[connectionEditIndex] = updatedConnection;
+            saveSavedConnections();
+            updateConnectionsList();
+            updateConnectionDropdown();
+            connectionEditForm.reset();
+            updateEditConnectionFormFields();
+            document.getElementById('conn-edit-tab-btn').classList.add('hidden');
+            connectionEditIndex = null;
+
+            // Switch to list tab
+            connTabBtns[0].click();
+
+            console.log('Connection updated');
+        });
+
+        // Cancel edit button
+        const btnCancelEdit = connectionEditForm.querySelector('.btn-cancel-edit');
+        if (btnCancelEdit) {
+            btnCancelEdit.addEventListener('click', () => {
+                connectionEditForm.reset();
+                updateEditConnectionFormFields();
+                document.getElementById('conn-edit-tab-btn').classList.add('hidden');
+                connectionEditIndex = null;
+                connTabBtns[0].click();
+            });
+        }
     }
 
     // Initialize connections on page load
@@ -3194,11 +3646,18 @@
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify(requestBody)
             });
 
             const body = await response.json();
             stopBackendLoading();
+
+            if (response.status === 419) {
+                resultElement.innerHTML = '<div class="results-status error">Session expired. Please refresh the page and try again.</div>';
+                resultElement.style.display = 'block';
+                return;
+            }
 
             if (!response.ok || body.error) {
                 resultElement.innerHTML = '<div class="results-status error">Error: ' + escapeHtml(body.error || 'Unknown error') + '</div>';
@@ -3439,7 +3898,7 @@
         btnRun.disabled = true;
 
         try {
-            const { ok, body } = await withBackendLoading(async () => {
+            const { ok, body, status } = await withBackendLoading(async () => {
                 const requestBody = { sql };
                 if (customMode && selectedDatabaseConnection) {
                     const dbType = getDatabaseTypeForApi();
@@ -3455,12 +3914,19 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
+                    credentials: 'same-origin',
                     body: JSON.stringify(requestBody)
                 });
 
                 const body = await response.json();
-                return { ok: response.ok, body };
+                return { ok: response.ok, body, status: response.status };
             });
+
+            if (status === 419) {
+                errorDiv.textContent = 'Session expired. Please refresh the page and try again.';
+                errorDiv.style.display = 'block';
+                return;
+            }
 
             if (!ok || body.error) {
                 errorDiv.textContent = body.error || 'An unknown error occurred.';
